@@ -11,34 +11,22 @@ def conexion():
   cursor.close()
   return con
 
-def insertarDatos():
-  cant=int(input('Cuantos datos va a insertar: '))
-  con=conexion()
-  cursor=con.cursor()
-  for i in range(cant):
-    nom=input('Dame el nombre de la persona: ')
-    nom=nom.strip()
-    nom=nom.lower()
-    cursor.execute(f'insert into prueba(nombres) values ("{nom}")')
-    con.commit()
-  cursor.close()
-
-def buscarUsuario():
+def buscarUsuario(nom):
+  ori=nom
+  nom=nom.lower().strip()
   con=conexion()
   cur=con.cursor()
-  nom=input('Dame un nombre a buscar:')
-  nom=nom.strip(' ')
-  ori=nom
-  nom=nom.lower()
-  cur.execute(f"select * from prueba where nombres='{nom}';")
+  cur.execute(f"select * from usuario where usuario='{nom}';")
   busqueda=()
   for i in cur:
     busqueda=i
   if len(busqueda)!=0:
-    print(f'Se encontro el usuario {ori}')
+    cur.close()
+    return True
   else:
-    print(f'No se encontro el usuario {ori}')
-  cur.close()
+    cur.close()
+    return False
+  
 
 #insertarDatos()
 
@@ -49,14 +37,31 @@ def verificarUsuario(usuario,contraseña):
   user=()
   for i in cur:
     user=i
-  cur.execute(f"select * from usuario where contraseña='{usuario}';")
+  cur.execute(f"select * from usuario where contraseña='{contraseña}';")
   contra=()
   for i in cur:
     contra=i
-  
+
   if len(user)!=0 and len(contra)!=0:
+    cur.close()
     return True
   else:
+    cur.close()
     return False
+
+def registrar(usuario, contraseña):
+  pass
+  # tabla operaciones:
+  #create table operaciones
+  # (
+  # id int auto_increment, 
+  # id_usuario smallint, 
+  # id_activo smallint, 
+  # valor dec(7,2),
+  # valorPorcentaje dec(5,2),
+  # fecha date, 
+  # primary key(id),
+  # foreign key(id_usuario) references usuario(id), 
+  # foreign key(id_activo) references activo(id)
+  # );
   
-  cur.close()
