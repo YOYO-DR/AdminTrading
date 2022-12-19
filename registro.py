@@ -1,5 +1,6 @@
 from tkinter import *
-from BD import conexionBD
+from BD.conexionBD import *
+from tkinter import messagebox
 import os
 
 class Registro:
@@ -38,17 +39,26 @@ class Registro:
     self.confiContra=Label(self.registro,bg='#a6a6a6', text='Confirmar contraseña:',font=('Leelawadee UI Semilight',15)).place(x=1,y=346)
     self.ValorConfiContra=StringVar()
     self.confiContra=Entry(self.registro,width=18,bg='#8c8c8c',font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorConfiContra,show='*').place(x=195,y=351)
-    
 
-    #botones aceptar y cancelar
-    '''self.botonAceptar=Button(self.registro,bg='#8c8c8c',text='Aceptar',command=self.FAceptar)
-    self.botonAceptar.place(x=130,y=355)
+    #boton registrar
+    self.botonAceptar=Button(self.registro,bg='#8c8c8c',text='Registrar',command=self.FRegistro)
+    self.botonAceptar.place(x=125,y=390)
     self.botonAceptar.config(width=22)
 
-    self.botonCancelar=Button(self.registro,bg='#ac3a3a',text='Cancelar',command=self.FCancelar)
-    self.botonCancelar.place(x=130,y=385)
-    self.botonCancelar.config(width=22)
-    #funcion ultima para que la ventana mantenga activa'''
+
     self.registro.mainloop()
 
+  def FRegistro(self):
+    usuario=self.ValorUsuario.get()
+    verificar=buscarUsuario(usuario)
+    if verificar==True:
+      messagebox.showwarning('Usuario','Usuario ya existe, elige otro.')
+      self.ValorUsuario.set('')
+    elif self.ValorUsuario:
+      messagebox.showwarning('Usuario','Usuario no puede estar vacio.')
+    elif self.ValorContraseña=='':
+      messagebox.showwarning('Contraseña','La contraseña no puede estar vacio.')
+    elif self.confiContra=='':
+      messagebox.showwarning('Confirmacion','La confirmacion, no puede estar vacio.')
+    
 ejecucion=Registro()

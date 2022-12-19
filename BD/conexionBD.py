@@ -49,6 +49,8 @@ def verificarUsuario(usuario,contraseña):
     cur.close()
     return False
 
+
+
 def registrar(usuario, contraseña):
   pass
   # tabla operaciones:

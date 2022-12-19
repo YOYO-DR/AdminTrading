@@ -51,7 +51,7 @@ class Login:
     self.separador.place(x=130,y=420)
 
     #boton registrar
-    self.botonRegistrar=Button(self.login,bg='#038554',text='Registrar',command=self.FRegistrar)
+    self.botonRegistrar=Button(self.login,bg='#038554',text='Registrar',command=self.FRegistro)
     self.botonRegistrar.place(x=130,y=430)
     self.botonRegistrar.config(width=22)
     #funcion ultima para que la ventana mantenga activa
@@ -84,7 +84,7 @@ Si es nuevo, presiona en registrar para crear un usuario.''')
         self.ValorContraseña.set('')
 
   #registrar usuario
-  def FRegistrar(self):
+  def FRegistro(self):
     messagebox.showinfo('Registro','Funcion proxima')
 
   #cancelar inicio
