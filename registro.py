@@ -60,5 +60,5 @@ class Registro:
       messagebox.showwarning('Contraseña','La contraseña no puede estar vacio.')
     elif self.confiContra=='':
       messagebox.showwarning('Confirmacion','La confirmacion, no puede estar vacio.')
-    
+      #Terminar ventana de registro
 ejecucion=Registro()
