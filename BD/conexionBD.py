@@ -6,7 +6,7 @@ def conexion():
   user='yoyo',
   password='119351',
   port='3306',
-  database='adminTrading')
+  database='prueba')
   cursor = con.cursor()
   cursor.close()
   return con
@@ -52,7 +52,12 @@ def verificarUsuario(usuario,contraseña):
 
 
 def registrar(usuario, contraseña):
-  pass
+  con=conexion()
+  cursor=con.cursor()
+  cursor.execute(f"insert into usuario(usuario,contraseña) values('{usuario}','{contraseña}');")
+  con.commit()
+  cursor.close()
+
   # tabla operaciones:
   #create table operaciones
   # (

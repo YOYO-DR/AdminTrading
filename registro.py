@@ -28,7 +28,8 @@ class Registro:
     #Entry de usuario
     self.nombre=Label(self.registro,bg='#a6a6a6', text='Usuario:',font=('Leelawadee UI Semilight',15)).place(x=117,y=274)
     self.ValorUsuario=StringVar()
-    self.usuario=Entry(self.registro,width=18,bg='#8c8c8c',font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorUsuario).place(x=195,y=280)
+    self.usuario=Entry(self.registro,width=18,bg='#8c8c8c',font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorUsuario)
+    self.usuario.place(x=195,y=280)
 
     #entry de contraseña
     self.contraseña=Label(self.registro,bg='#a6a6a6', text='Contraseña:',font=('Leelawadee UI Semilight',15)).place(x=85,y=311)
@@ -41,24 +42,51 @@ class Registro:
     self.confiContra=Entry(self.registro,width=18,bg='#8c8c8c',font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorConfiContra,show='*').place(x=195,y=351)
 
     #boton registrar
-    self.botonAceptar=Button(self.registro,bg='#8c8c8c',text='Registrar',command=self.FRegistro)
+    self.botonAceptar=Button(self.registro,bg='#038554',text='Registrar',command=self.FRegistro)
     self.botonAceptar.place(x=125,y=390)
     self.botonAceptar.config(width=22)
 
 
     self.registro.mainloop()
 
+
+
   def FRegistro(self):
     usuario=self.ValorUsuario.get()
+    usuario=usuario.strip()
     verificar=buscarUsuario(usuario)
+
+    contraseña=self.ValorContraseña.get()
+    contraseña=contraseña.strip()
+
+    confi=self.ValorConfiContra.get()
+    confi=confi.strip()
+
     if verificar==True:
-      messagebox.showwarning('Usuario','Usuario ya existe, elige otro.')
+      messagebox.showwarning('Usuario','El nombre de usuario ya existe, elige otro.')
       self.ValorUsuario.set('')
-    elif self.ValorUsuario:
+      self.ValorContraseña.set('')
+      self.ValorConfiContra.set('')
+    elif usuario=='':
       messagebox.showwarning('Usuario','Usuario no puede estar vacio.')
-    elif self.ValorContraseña=='':
+    elif contraseña=='':
       messagebox.showwarning('Contraseña','La contraseña no puede estar vacio.')
-    elif self.confiContra=='':
+    elif confi=='':
       messagebox.showwarning('Confirmacion','La confirmacion, no puede estar vacio.')
       #Terminar ventana de registro
+    elif len(contraseña)<8 or len(contraseña)>12:
+      messagebox.showerror('Tamaño contraseña','La contraseña debe ser de minimo 8 y maximo de 12 caracteres.')
+      self.ValorContraseña.set('')
+      self.ValorConfiContra.set('')
+    elif contraseña!=confi:
+      messagebox.showerror('Confirmacion contraseña','La confirmacion no es igual a la contraseña.')
+      self.ValorContraseña.set('')
+      self.ValorConfiContra.set('')
+    else:
+      try:
+        registrar(usuario,contraseña)
+        messagebox.showinfo('Registro','Usuario registrado')
+      except:
+        messagebox.showerror('Error','Hubo un problema al registrar al usuario, vuelve a intentar.')
+
 ejecucion=Registro()
