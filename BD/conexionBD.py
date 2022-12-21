@@ -6,7 +6,7 @@ def conexion():
   user='yoyo',
   password='119351',
   port='3306',
-  database='prueba')
+  database='adminTrading')
   cursor = con.cursor()
   cursor.close()
   return con
@@ -26,9 +26,6 @@ def buscarUsuario(nom):
   else:
     cur.close()
     return False
-  
-
-#insertarDatos()
 
 def verificarUsuario(usuario,contraseña):
   con=conexion()
@@ -49,7 +46,14 @@ def verificarUsuario(usuario,contraseña):
     cur.close()
     return False
 
-
+def obtenerIdUsuario(usuario):
+  con=conexion()
+  cursor=con.cursor()
+  cursor.execute(f"select * from usuario where usuario='{usuario}'")
+  for i in cursor:
+    idUsuario=i[0]
+  con.close()
+  return idUsuario
 
 def registrar(usuario, contraseña):
   con=conexion()
@@ -58,6 +62,68 @@ def registrar(usuario, contraseña):
   con.commit()
   cursor.close()
 
+def obtenActivos():
+  con=conexion()
+  cursor=con.cursor()
+  cursor.execute(f"select * from activo")
+  activos=['']
+  for i in cursor:
+    activos.append(i[1].upper())
+  con.close()
+  return activos
+
+def siguienteID():
+  con=conexion()
+  cursor=con.cursor()
+  idUltimo=0
+  cursor.execute('select max(id) from operaciones;')
+  for i in cursor:
+    idUltimo=i[0]
+  idUltimo+=1
+  con.close()
+  return idUltimo
+
+def guardarValores(datos): 
+  con=conexion()
+  cursor=con.cursor()
+  cursor.execute(f"select * from activo where nombre_activo='{datos[1]}'")
+  for i in cursor:
+    id_activo=i[0]
+  cursor.execute(f"insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha) values ({datos[0]},{id_activo}, {datos[2]}, {datos[3]}, '{datos[4]}');")
+  con.commit()
+  con.close()
+
+def obtenerValorInicio(idUsuario):
+  con=conexion()
+  cursor=con.cursor()
+  valorInicio=0
+  cursor.execute(f"select * from usuario where id={idUsuario};")
+  for i in cursor:
+    valorInicio=i[3]
+  con.close()
+  return valorInicio
+
+def sumarOperacion(operacion,idUsuario):
+  con=conexion()
+  cursor=con.cursor()
+  valorActual=0
+  cursor.execute(f"select * from usuario where id={idUsuario};")
+  for i in cursor:
+    valorActual=float(i[4])
+  valorActual+=operacion
+  cursor.execute(f"update usuario set totalActual={valorActual} where id={idUsuario};")
+  con.commit()
+  con.close()
+
+def obtenerValorActual(idUsuario):
+  con=conexion()
+  cursor=con.cursor()
+  cursor.execute(f"select * from usuario where id={idUsuario}")
+  valorActual=0
+  for i in cursor:
+    valorActual=i[4]
+  con.close()
+  return valorActual
   # tabla operaciones:
   #create table operaciones
   # (
@@ -72,3 +138,5 @@ def registrar(usuario, contraseña):
   # foreign key(id_activo) references activo(id)
   # );
   
+
+#insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha) values (1,4,-1.03,-1.03,'2022-11-23');

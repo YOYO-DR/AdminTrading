@@ -18,7 +18,7 @@ class VentanaLogin:
     #ruta de la carpeta Img
     self.carpetaMedia=os.path.join(os.path.join(os.path.dirname(__file__),'media'),'img')
     #logo de la ventana
-    self.login.iconbitmap(os.path.join(self.carpetaMedia,'tradingIco.ico'))
+    self.login.iconbitmap(os.path.join(self.carpetaMedia,'icono.ico'))
 #----------------------------------------------------------------#
     self.bienvenida=Label(self.login,bg='#a6a6a6', text='¡BIENVENIDO!\nInicia sesión',font=('Leelawadee UI Semilight',20)).place(x=120,y=180)
 
@@ -79,7 +79,7 @@ Si es nuevo, presiona en registrar para crear un usuario.''')
       if valor==True:
         self.login.destroy()
         if __name__ == '__main__':
-          VentanaPrincipal()
+          VentanaPrincipal(obtenerIdUsuario(usuario))
 
       else:
         messagebox.showwarning('Inicio de sesión','Contraseña incorrecta, vuelve a intentar.')
@@ -111,7 +111,7 @@ class VentanaRegistro:
     self.carpetaMedia=os.path.join(os.path.join(os.path.dirname(__file__),'media'),'img')
     self.carpetaLogin=os.path.join(self.carpetaMedia,'login')
     #logo de la ventana
-    self.registro.iconbitmap(os.path.join(self.carpetaMedia,'tradingIco.ico'))
+    self.registro.iconbitmap(os.path.join(self.carpetaMedia,'icono.ico'))
 #----------------------------------------------------------------#
     self.bienvenida=Label(self.registro,bg='#a6a6a6', text='Registro',font=('Leelawadee UI Semilight',20)).place(x=160,y=200)
 
@@ -211,4 +211,3 @@ class VentanaRegistro:
         messagebox.showerror('Error','Hubo un problema al registrar al usuario, vuelve a intentar.')
 
 VentanaLogin()
-
