@@ -124,6 +124,32 @@ def obtenerValorActual(idUsuario):
     valorActual=i[4]
   con.close()
   return valorActual
+
+def actualizarInicio(idUsuario,valor):
+  con=conexion()
+  cursor=con.cursor()
+  cursor.execute(f"update usuario set inicioCuenta={valor} where id={idUsuario};")
+  con.commit()
+  con.close()
+  
+def sumaTodasOperaciones(idUsuario):
+  con=conexion()
+  cursor=con.cursor()
+  suma=0
+  cursor.execute(f"select * from operaciones where id_usuario={idUsuario}")
+  for i in cursor:
+    suma+=i[3]
+  return suma
+  con.close()
+
+def actualizarValorActual(idUsario):
+  con=conexion()
+  cursor=con.cursor()
+  valor=sumaTodasOperaciones(idUsario)+obtenerValorInicio(idUsario)
+  cursor.execute(f"update usuario set totalActual={valor} where id={idUsario};")
+  con.commit()
+  con.close()
+
   # tabla operaciones:
   #create table operaciones
   # (

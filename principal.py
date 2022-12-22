@@ -38,16 +38,20 @@ class VentanaPrincipal:
     #obtengo valor de inicio
     self.valorInicioMostrar=obtenerValorInicio(self.IDusuario)
 
-    self.valorInicioB=Canvas(self.root,width=265,height=40,bg='grey90')
-    self.valorInicioB.place(x=300,y=0)
+    self.valorInicioB=Canvas(self.root,width=300,height=40,bg='grey90')
+    self.valorInicioB.place(x=240,y=0)
 
     #label del valor de inicio
+    actualizarValorActual(self.IDusuario)
     self.MValorActual=obtenerValorActual(self.IDusuario)
     self.tituloB=Label(self.root,text=f'Inicio: {self.valorInicioMostrar}   Actual: {self.MValorActual}',bg='grey90',font=('Leelawadee UI Semilight',14,'bold'))
-    self.tituloB.place(x=310,y=5)
+    self.tituloB.place(x=285,y=5)
 
-    #boton modificar inicio
 
+    #botones modificar inicio
+    self.imgActualizar=PhotoImage(file=os.path.join(self.carpetaImg,'botonActualizar.png')).subsample(21)
+    self.modificarI=Button(self.root,image=self.imgActualizar,bg='#9acef8',font=('Leelawadee UI Semilight',8,'bold'),command=self.actuaInicio)
+    self.modificarI.place(x=250,y=7)
 
     #----------------------elementos del apartado de operaciones----------------------#
     #apartado de ingresar operaciones
@@ -177,7 +181,6 @@ class VentanaPrincipal:
     self.actualizarL=Label(self.root,text='¿Desea borrar la operacion n° ?',bg='grey90',font=('Leelawadee UI Semilight',14,'bold'))
     self.actualizarL.place(x=535,y=415)
 
-    self.ValorCheck()
     self.root.mainloop()
 
   def guardar(self):
@@ -186,6 +189,7 @@ class VentanaPrincipal:
         guardarValores(self.valoresGuardar)
         sumarOperacion((float(self.valorUsdS.get())),self.IDusuario)
         messagebox.showinfo('Operacion','La operacion se guardo correctamente')
+        actualizarValorActual(self.IDusuario)
         self.MValorActual=obtenerValorActual(self.IDusuario)
         self.tituloB.config(text=f'Inicio: {self.valorInicioMostrar}   Actual: {self.MValorActual}')
       except:
@@ -246,6 +250,55 @@ ID: {id}'''
       hoy=time.localtime()
       self.fechaE.insert(0,f'{hoy.tm_year}-{hoy.tm_mon}-{hoy.tm_mday}')
 
+  def actuaInicio(self):
+    self.tituloB.config(text='Inicio:')
+    #entry del listo
+    self.entryValorNVari=StringVar()
+    self.entryValorN=Entry(self.root,textvariable=self.entryValorNVari,font=('Leelawadee UI Semilight',11),width=5)
+    self.entryValorN.place(x=350,y=10)
+
+    #boton listo
+    self.imgBotonListo=PhotoImage(file=os.path.join(self.carpetaImg,'check.png')).subsample(20)
+    self.botonListoO=Button(self.root,image=self.imgBotonListo,bg='#92e27a',command=self.botonListoOpe)
+    self.botonListoO.place(x=402,y=5)
 
 
-#VentanaPrincipal(1)
+    #boton cancelar
+    self.imgBotonCancelar=PhotoImage(file=os.path.join(self.carpetaImg,'cancel.png')).subsample(20)
+    self.botonCancelarO=Button(self.root,image=self.imgBotonCancelar,bg='#ff7676',command=self.botonCancelarOpe)
+    self.botonCancelarO.place(x=442,y=5)
+
+  def botonCancelarOpe(self):
+    self.tituloB.config(text=f'Inicio: {self.valorInicioMostrar}   Actual: {self.MValorActual}')
+    self.botonCancelarO.place_forget()
+    self.botonListoO.place_forget()
+    self.entryValorN.place_forget()
+
+  def botonListoOpe(self):
+    control=False
+    valorActual=obtenerValorInicio(self.IDusuario)
+    try:
+      valor=float(self.entryValorNVari.get())
+      control=True
+      if control==True:
+        try:
+          actualizarInicio(self.IDusuario,valor)
+          self.botonCancelarOpe()
+          messagebox.showinfo('Actualizado',f'Valor inicio: {valorActual} \nActualizado a: {valor}.')
+          actualizarValorActual(self.IDusuario)
+          self.MValorActual=obtenerValorActual(self.IDusuario)
+          self.valorInicioMostrar=obtenerValorInicio(self.IDusuario)
+          self.tituloB.config(text=f'Inicio: {self.valorInicioMostrar}   Actual: {self.MValorActual}')
+        except:
+          messagebox.showerror('Error','Error al actualizar el valor, vuelve a intentar')
+          self.botonCancelarOpe()
+    except:
+      messagebox.showwarning('Error','No es un numero lo que ingresaste, formato (0.00)')
+      self.botonCancelarOpe()
+    
+
+    
+
+
+
+VentanaPrincipal(1)
