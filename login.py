@@ -78,8 +78,7 @@ Si es nuevo, presiona en registrar para crear un usuario.''')
       valor=verificarUsuario(usuario,contraseña)
       if valor==True:
         self.login.destroy()
-        if __name__ == '__main__':
-          VentanaPrincipal(obtenerIdUsuario(usuario))
+        VentanaPrincipal(obtenerIdUsuario(usuario))
 
       else:
         messagebox.showwarning('Inicio de sesión','Contraseña incorrecta, vuelve a intentar.')
@@ -88,8 +87,7 @@ Si es nuevo, presiona en registrar para crear un usuario.''')
   #registrar usuario
   def FRegistro(self):
     self.login.destroy()
-    if __name__ == '__main__':
-          VentanaRegistro()
+    VentanaRegistro()
 
   #cancelar inicio
   def FCancelar(self):
@@ -159,8 +157,7 @@ class VentanaRegistro:
 
   def volverLogin(self):
     self.registro.destroy()
-    if __name__ == '__main__':
-        VentanaLogin()
+    VentanaLogin()
 
   def FCancelar(self):
       self.registro.destroy()
@@ -205,9 +202,9 @@ class VentanaRegistro:
         registrar(usuario,contraseña)
         messagebox.showinfo('Registro','Usuario registrado')
         self.registro.destroy()
-        if __name__ == '__main__':
-          VentanaLogin()
+        VentanaLogin()
       except:
         messagebox.showerror('Error','Hubo un problema al registrar al usuario, vuelve a intentar.')
 
-VentanaLogin()
+if __name__ == '__main__':
+  VentanaLogin()
