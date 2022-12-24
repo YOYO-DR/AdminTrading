@@ -2,9 +2,9 @@ import mysql.connector
 
 def conexion():
   con = mysql.connector.connect(
-  host='20.168.252.60',
-  user='yoyo',
-  password='119351',
+  host='127.0.0.1',
+  user='root',
+  password='root',
   port='3306',
   database='adminTrading')
   cursor = con.cursor()
@@ -55,10 +55,10 @@ def obtenerIdUsuario(usuario):
   con.close()
   return idUsuario
 
-def registrar(usuario, contraseña):
+def registrar(usuario, contraseña,valorInicial):
   con=conexion()
   cursor=con.cursor()
-  cursor.execute(f"insert into usuario(usuario,contraseña) values('{usuario}','{contraseña}');")
+  cursor.execute(f"insert into usuario(usuario,contraseña,inicioCuenta,totalActual) values('{usuario}','{contraseña}',{valorInicial},{valorInicial});")
   con.commit()
   cursor.close()
 
@@ -66,7 +66,7 @@ def obtenActivos():
   con=conexion()
   cursor=con.cursor()
   cursor.execute(f"select * from activo")
-  activos=['']
+  activos=[]
   for i in cursor:
     activos.append(i[1].upper())
   con.close()

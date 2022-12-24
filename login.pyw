@@ -100,7 +100,7 @@ class VentanaRegistro:
     self.registro = Tk()
     self.registro.config(bg='#a6a6a6')
     #asigno tamaño y posicion
-    self.registro.geometry("400x500+470+85")
+    self.registro.geometry("400x500+1750+85")
     #bloqueo la modificacion de las posiciones
     self.registro.resizable(width=False, height=False)
     #titulo de la ventana
@@ -111,27 +111,33 @@ class VentanaRegistro:
     #logo de la ventana
     self.registro.iconbitmap(os.path.join(self.carpetaMedia,'icono.ico'))
 #----------------------------------------------------------------#
-    self.bienvenida=Label(self.registro,bg='#a6a6a6', text='Registro',font=('Leelawadee UI Semilight',20)).place(x=160,y=200)
+    self.bienvenida=Label(self.registro,bg='#a6a6a6', text='Registro',font=('Leelawadee UI Semilight',20)).place(x=160,y=180)
 
     #Foto de bienvenida
     self.fotoB=PhotoImage(file=os.path.join(self.carpetaLogin,'signup_100_2.png')).zoom(2)
     Label(self.registro,image=self.fotoB,bd=0).place(x=105,y=-10)
 
     #Entry de usuario
-    self.nombre=Label(self.registro,bg='#a6a6a6', text='Usuario:',font=('Leelawadee UI Semilight',15)).place(x=117,y=274)
+    self.nombre=Label(self.registro,bg='#a6a6a6', text='Usuario:',font=('Leelawadee UI Semilight',15)).place(x=117,y=234)
     self.ValorUsuario=StringVar()
     self.usuario=Entry(self.registro,width=18,bg='#8c8c8c',font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorUsuario)
-    self.usuario.place(x=195,y=280)
+    self.usuario.place(x=195,y=240)
 
     #entry de contraseña
-    self.contraseña=Label(self.registro,bg='#a6a6a6', text='Contraseña:',font=('Leelawadee UI Semilight',15)).place(x=85,y=311)
+    self.contraseña=Label(self.registro,bg='#a6a6a6', text='Contraseña:',font=('Leelawadee UI Semilight',15)).place(x=85,y=271)
     self.ValorContraseña=StringVar()
-    self.contraseña=Entry(self.registro,width=18,bg='#8c8c8c',font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorContraseña,show='*').place(x=195,y=316)
+    self.contraseña=Entry(self.registro,width=18,bg='#8c8c8c',font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorContraseña,show='*').place(x=195,y=276)
    
    #entry de confirmacion de contraseña
-    self.confiContra=Label(self.registro,bg='#a6a6a6', text='Confirmar contraseña:',font=('Leelawadee UI Semilight',15)).place(x=1,y=346)
+    self.confiContra=Label(self.registro,bg='#a6a6a6', text='Confirmar contraseña:',font=('Leelawadee UI Semilight',15)).place(x=1,y=306)
     self.ValorConfiContra=StringVar()
-    self.confiContra=Entry(self.registro,width=18,bg='#8c8c8c',font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorConfiContra,show='*').place(x=195,y=351)
+    self.confiContra=Entry(self.registro,width=18,bg='#8c8c8c',font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorConfiContra,show='*').place(x=195,y=311)
+
+    #entry de valor inicial de la cuenta
+    self.valorInicial=Label(self.registro,bg='#a6a6a6', text='Valor de la cuenta:',font=('Leelawadee UI Semilight',15)).place(x=30,y=345)
+    self.ValorInicialC=StringVar()
+    self.valorInicial=Entry(self.registro,width=18,bg='#8c8c8c',font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorInicialC).place(x=195,y=351)
+    self.ValorInicialC.set('0')
 
     #boton registrar
     self.botonAceptar=Button(self.registro,bg='#038554',text='Registrar',command=self.FRegistro)
@@ -162,8 +168,6 @@ class VentanaRegistro:
   def FCancelar(self):
       self.registro.destroy()
       
-
-
   def FRegistro(self):
     usuario=self.ValorUsuario.get()
     usuario=usuario.strip()
@@ -199,12 +203,25 @@ class VentanaRegistro:
       self.ValorConfiContra.set('')
     else:
       try:
-        registrar(usuario,contraseña)
-        messagebox.showinfo('Registro','Usuario registrado')
-        self.registro.destroy()
-        VentanaLogin()
+        valorInicial=float(self.ValorInicialC.get())
+        valorInicial=round(valorInicial,2)
+        if valorInicial==0:
+          messagebox.showinfo('Valor inicial','El valor inicial no puede estar vacio o ser igual a "0".')
+        else:
+          try:
+            registrar(usuario,contraseña,valorInicial)
+            messagebox.showinfo('Registro','Usuario registrado')
+            self.registro.destroy()
+            VentanaLogin()
+          except:
+            messagebox.showerror('Error','Hubo un problema al registrar al usuario, vuelve a intentar.')
       except:
-        messagebox.showerror('Error','Hubo un problema al registrar al usuario, vuelve a intentar.')
+        messagebox.showerror('Error','El valor debe ser un numero, formato: 0.00')
+        self.ValorInicialC.set('0')
+        
+
+
 
 if __name__ == '__main__':
   VentanaLogin()
+  #VentanaRegistro()
