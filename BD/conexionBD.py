@@ -1,4 +1,6 @@
 import mysql.connector
+import time
+from datetime import datetime
 
 def conexion():
   con = mysql.connector.connect(
@@ -139,8 +141,8 @@ def sumaTodasOperaciones(idUsuario):
   cursor.execute(f"select * from operaciones where id_usuario={idUsuario}")
   for i in cursor:
     suma+=i[3]
-  return suma
   con.close()
+  return suma
 
 def actualizarValorActual(idUsario):
   con=conexion()
@@ -149,6 +151,39 @@ def actualizarValorActual(idUsario):
   cursor.execute(f"update usuario set totalActual={valor} where id={idUsario};")
   con.commit()
   con.close()
+
+def sumaOperMes(id):
+  con=conexion()
+  cursor=con.cursor()
+  fecha=time.localtime()
+  mes=f'{fecha.tm_year}-{fecha.tm_mon}'
+  cursor.execute(f"select o.id, o.valor, a.nombre_activo activo, o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario=1 and o.fecha like '{mes}%';")
+  suma=0
+  for i in cursor:
+    suma+=float(i[1])
+  ValorIniMes=float(obtenerValorActual(id))-suma
+  por=(suma/ValorIniMes)*100
+  con.close()
+  return [suma,por]
+
+def sumaOperSemana(id):
+  diaActualSem=int(datetime.today().weekday())+1
+  con=conexion()
+  cursor=con.cursor()
+  localT=time.localtime()
+  anioMes=f'{localT.tm_year}-{localT.tm_mon}'
+  hoy=int(localT.tm_mday)-diaActualSem
+  cursor.execute(f"select o.id, o.valor,a.nombre_activo activo,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario=1 and o.fecha >= '{anioMes}-{hoy}';")
+  suma=0
+  for i in cursor:
+    suma+=float(i[1])
+  con.close()
+
+  ValorIniSemana=float(obtenerValorActual(id))-suma
+  por=(suma/ValorIniSemana)*100
+
+  return [suma,por]
+
 
   # tabla operaciones:
   #create table operaciones

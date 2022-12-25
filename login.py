@@ -100,7 +100,7 @@ class VentanaRegistro:
     self.registro = Tk()
     self.registro.config(bg='#a6a6a6')
     #asigno tamaño y posicion
-    self.registro.geometry("400x500+1750+85")
+    self.registro.geometry("400x500+470+85")
     #bloqueo la modificacion de las posiciones
     self.registro.resizable(width=False, height=False)
     #titulo de la ventana
@@ -218,9 +218,6 @@ class VentanaRegistro:
       except:
         messagebox.showerror('Error','El valor debe ser un numero, formato: 0.00')
         self.ValorInicialC.set('0')
-        
-
-
 
 if __name__ == '__main__':
   VentanaLogin()
