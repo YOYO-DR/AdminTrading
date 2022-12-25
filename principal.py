@@ -321,16 +321,32 @@ class VentanaPrincipal:
 
     #combobox de la seleccion
     self.activoSelectBus=StringVar()
-    self.activoOpcionesBus=['ID','DIA','MES','ACTIVO','TODO','PRIMERAS','ULTIMAS']
+    self.activoOpcionesBus=['ID','DIA','MES','ACTIVO','TODO']
     self.selectFormaBus=ttk.Combobox(self.root,state='readonly',width=10,\
       font=('Leelawadee UI Semilight',10),textvariable=self.activoSelectBus,values=self.activoOpcionesBus)
     self.selectFormaBus.place(x=540,y=110)
     self.activoSelectBus.set('ID')
+    #Le digo el evento de seleccionar y que hacer al seleccionarlo
+    self.selectFormaBus.bind("<<ComboboxSelected>>",self.seleccionBus)
     
     #boton buscar
-    self.botonBuscarOpe=Button(self.root,text='Siguiente',bg='#92e27a',\
-    font=('Leelawadee UI Semilight',9,'bold'),width=14,command=self.seleccionBus)
-    self.botonBuscarOpe.place(x=540,y=145)
+    self.botonBuscar=Button(self.root,text='Buscar',bg='#92e27a',\
+    font=('Leelawadee UI Semilight',9,'bold'),command=self.buscar)
+    self.botonBuscar.place(x=535,y=145)
+
+
+    #checkbox de + y/o -
+    self.valorCheckPos=IntVar()
+    self.chekPositivo=Checkbutton(self.root,text='+',\
+      font=('Bahnschrift',10),bg='grey90',variable=self.valorCheckPos,onvalue=1,offvalue=0)
+    self.chekPositivo.place(x=633,y=107)
+    self.valorCheckPos.set(1)
+
+    self.valorCheckNeg=IntVar()
+    self.chekNegativo=Checkbutton(self.root,text='-',\
+      font=('Bahnschrift',10),bg='grey90',variable=self.valorCheckNeg,onvalue=1,offvalue=0)
+    self.chekNegativo.place(x=665,y=107)
+    self.valorCheckNeg.set(1)
 
 #-----------------------------------------------------------
     #Seleccion ID
@@ -370,14 +386,69 @@ class VentanaPrincipal:
     self.activoLBus=Label(self.root,text=f'Activo',bg='grey90',\
       font=('Leelawadee UI Semilight',12))
     
+    #combobox de activo
+    self.activoSelectDia=StringVar()
+    self.activoOpcionesDia=obtenActivos()
+    self.selectActivoDia=ttk.Combobox(self.root,state='readonly',width=10,\
+      font=('Leelawadee UI Semilight',10),textvariable=self.activoSelectDia,\
+        values=self.activoOpcionesDia)
+
+    #label de poner dia
+    self.ponerDia=Label(self.root,text=f'Ingresa el dia',bg='grey90',\
+      font=('Leelawadee UI Semilight',12))
+ 
+
+    #entry de poner el dia
+    self.ponerDiaE=StringVar()
+    self.ePonerDia=Entry(self.root,textvariable=self.ponerDiaE,width=11)
+    self.ePonerDia.config(font=('Leelawadee UI Semilight',11))
+
+    #---------------------------------------------------
+    #Seleccion mes
+
+    #label activo seleccion
+    self.activoLBusMes=Label(self.root,text=f'Activo',bg='grey90',\
+      font=('Leelawadee UI Semilight',12))
 
     #combobox de activo
-    self.activoSelectID=StringVar()
-    self.activoOpcionesID=obtenActivos()
-    self.selectA=ttk.Combobox(self.root,state='readonly',width=10,\
-      font=('Leelawadee UI Semilight',10),textvariable=self.activoSelectID,\
-        values=self.activoOpcionesID)
+    self.activoSelectMes=StringVar()
+    self.activoOpcionesMes=obtenActivos()
+    self.selectActivoMes=ttk.Combobox(self.root,state='readonly',width=10,\
+      font=('Leelawadee UI Semilight',10),textvariable=self.activoSelectMes,\
+        values=self.activoOpcionesMes)
+
+      #label de poner Mes
+    self.ponerMes=Label(self.root,text=f'Ingresa el mes',bg='grey90',\
+      font=('Leelawadee UI Semilight',12))
     
+    #entry de poner el Mes
+    self.ponerMesE=StringVar()
+    self.ePonerMes=Entry(self.root,textvariable=self.ponerDiaE,width=11)
+    self.ePonerMes.config(font=('Leelawadee UI Semilight',11))
+
+#---------------------------------------------------
+    #Seleccion activo
+
+    #label activo seleccion
+    self.activoLBusActi=Label(self.root,text=f'Activo',bg='grey90',\
+      font=('Leelawadee UI Semilight',12))
+    #combobox de activo
+    self.activoSelectOp=StringVar()
+    self.activoOpcionesOp=obtenActivos()
+    self.selectActivoOp=ttk.Combobox(self.root,state='readonly',width=10,\
+      font=('Leelawadee UI Semilight',10),textvariable=self.activoSelectOp,\
+        values=self.activoOpcionesOp)
+    
+
+    #-----------------------------------------
+    #canvas de resultado
+    self.resBuscar=Canvas(self.root,width=460,height=170,bg='grey90',bd=2)
+    self.resBuscar.place(x=550,y=200)
+
+    #label resultado
+    self.resBusL=Label(self.root,text=f'Resultado',bg='grey90',\
+      font=('Leelawadee UI Semilight',12))
+    self.resBusL.place(x=740,y=170)
 
     #----------------------------------------------------------------------------------------#
     #--------------------elementos del apartado de actualizar/borrar/logo--------------------#
@@ -627,7 +698,7 @@ ID: {id}'''
 
 #--------------------funciones del apartado de buscar operaciones--------------------#
 
-  def seleccionBus(self):
+  def seleccionBus(self,event):
     if self.activoSelectBus.get()=='ID':
       self.limpiarBus('ID')
 
@@ -639,14 +710,44 @@ ID: {id}'''
 
     elif self.activoSelectBus.get()=='DIA':
       self.limpiarBus('DIA')
-      self.activoLBus.place(x=715,y=85)
-      self.selectA.place(x=715,y=110)
+      self.activoLBus.place(x=865,y=85)
+      self.selectActivoDia.place(x=865,y=110)
+      self.ponerDia.place(x=730,y=85)
+      self.ePonerDia.place(x=730,y=110)
+    
+    elif self.activoSelectBus.get()=='MES':
+      self.limpiarBus('MES')
+      self.activoLBusMes.place(x=865,y=85)
+      self.selectActivoMes.place(x=865,y=110)
+      self.ponerMes.place(x=730,y=85)
+      self.ePonerMes.place(x=730,y=110)
+
+    elif self.activoSelectBus.get()=='ACTIVO':
+      self.limpiarBus('ACTIVO')
+      self.selectActivoOp.place(x=730,y=110)
+      self.activoLBusActi.place(x=730,y=85)
+    
+    elif self.activoSelectBus.get()=='TODO':
+      self.limpiarBus('TODO')
 
   def limpiarBus(self,seleccion):
     if seleccion=='ID':
       #cosas DIA
       self.activoLBus.place_forget()
-      self.selectA.place_forget()
+      self.selectActivoDia.place_forget()
+      self.ponerDia.place_forget()
+      self.ePonerDia.place_forget()
+      
+      #cosas mes
+      self.activoLBusMes.place_forget()
+      self.ponerMes.place_forget()
+      self.ePonerMes.place_forget()
+      self.selectActivoMes.place_forget()
+
+      #cosas activo
+      self.selectActivoOp.place_forget()
+      self.activoLBusActi.place_forget()
+
 
     elif seleccion=='DIA':
       #cosas ID
@@ -655,6 +756,102 @@ ID: {id}'''
       self.eIDBus.place_forget()
       self.ePrimerIDBus.place_forget()
       self.eSegunIDBus.place_forget()
+
+      #cosas mes
+      self.activoLBusMes.place_forget()
+      self.ponerMes.place_forget()
+      self.ePonerMes.place_forget()
+
+      #cosas activo
+      self.selectActivoOp.place_forget()
+      self.activoLBusActi.place_forget()
+    
+    elif seleccion=='MES':
+      #cosas ID
+      self.IDDeHas.place_forget()
+      self.opcionalID.place_forget()
+      self.eIDBus.place_forget()
+      self.ePrimerIDBus.place_forget()
+      self.eSegunIDBus.place_forget()
+      self.selectActivoMes.place_forget()
+
+      #cosas DIA
+      self.activoLBus.place_forget()
+      self.selectActivoDia.place_forget()
+      self.ponerDia.place_forget()
+      self.ePonerDia.place_forget()
+
+      #cosas activo
+      self.selectActivoOp.place_forget()
+      self.activoLBusActi.place_forget()
+    elif seleccion=='ACTIVO':
+      #cosas ID
+      self.IDDeHas.place_forget()
+      self.opcionalID.place_forget()
+      self.eIDBus.place_forget()
+      self.ePrimerIDBus.place_forget()
+      self.eSegunIDBus.place_forget()
+      self.selectActivoMes.place_forget()
+
+      #cosas DIA
+      self.activoLBus.place_forget()
+      self.selectActivoDia.place_forget()
+      self.ponerDia.place_forget()
+      self.ePonerDia.place_forget()
+      
+      #cosas mes
+      self.activoLBusMes.place_forget()
+      self.ponerMes.place_forget()
+      self.ePonerMes.place_forget()
+      self.selectActivoMes.place_forget()
+    
+    elif seleccion=='TODO':
+
+      #cosas ID
+      self.IDDeHas.place_forget()
+      self.opcionalID.place_forget()
+      self.eIDBus.place_forget()
+      self.ePrimerIDBus.place_forget()
+      self.eSegunIDBus.place_forget()
+      self.selectActivoMes.place_forget()
+
+      #cosas DIA
+      self.activoLBus.place_forget()
+      self.selectActivoDia.place_forget()
+      self.ponerDia.place_forget()
+      self.ePonerDia.place_forget()
+      
+      #cosas mes
+      self.activoLBusMes.place_forget()
+      self.ponerMes.place_forget()
+      self.ePonerMes.place_forget()
+      self.selectActivoMes.place_forget()
+
+      #cosas activo
+      self.selectActivoOp.place_forget()
+      self.activoLBusActi.place_forget()
+      
+  def buscar(self):
+    if self.activoSelectBus.get()=='ID':
+      try:
+        id=float(self.IDBus.get())
+
+      except:
+        messagebox.showwarning('ID','El ID debe ser un número.')
+        self.IDBus.set('')
+        
+        #self.primerID.set('')
+        #self.segunID.set('')
+
+    elif self.activoSelectBus.get()=='DIA':
+      pass
+    elif self.activoSelectBus.get()=='MES':
+      pass
+    elif self.activoSelectBus.get()=='ACTIVO':
+      pass
+    elif self.activoSelectBus.get()=='TODO':
+      pass
+
 
 VentanaPrincipal(1)
 
