@@ -326,6 +326,7 @@ class VentanaPrincipal:
       font=('Leelawadee UI Semilight',10),textvariable=self.activoSelectBus,values=self.activoOpcionesBus)
     self.selectFormaBus.place(x=540,y=110)
     self.activoSelectBus.set('ID')
+
     #Le digo el evento de seleccionar y que hacer al seleccionarlo
     self.selectFormaBus.bind("<<ComboboxSelected>>",self.seleccionBus)
     
@@ -347,6 +348,8 @@ class VentanaPrincipal:
       font=('Bahnschrift',10),bg='grey90',variable=self.valorCheckNeg,onvalue=1,offvalue=0)
     self.chekNegativo.place(x=665,y=107)
     self.valorCheckNeg.set(1)
+
+    
 
 #-----------------------------------------------------------
     #Seleccion ID
@@ -449,6 +452,31 @@ class VentanaPrincipal:
     self.resBusL=Label(self.root,text=f'Resultado',bg='grey90',\
       font=('Leelawadee UI Semilight',12))
     self.resBusL.place(x=740,y=170)
+
+
+    #crear scroll para un cuadro de texto
+    #text de resultado
+    #creo un frame parap posicionar con pack()
+    self.p_aux=Frame(self.root)
+    #lo posiciono
+    self.p_aux.place(x=561,y=211)
+    
+    #creo el scroll dentro del frame
+    self.scroll=Scrollbar(self.p_aux)
+    #Lo posiciono a la derecha del frame
+    self.scroll.pack(side=RIGHT,fill=Y)
+
+    #creo el text dentro del frame
+    self.textRes=Text(self.p_aux,font=\
+      ('Leelawadee UI Semilight',10),width=61,height=9,yscrollcommand=self.scroll.set)
+
+    #Posiciono la caja de texto a la izquierda del frame
+    self.textRes.pack(side=LEFT)
+
+    #enlazar scroll a la text
+    self.scroll.config(command=self.textRes.yview)
+    
+
 
     #----------------------------------------------------------------------------------------#
     #--------------------elementos del apartado de actualizar/borrar/logo--------------------#
@@ -833,15 +861,27 @@ ID: {id}'''
       
   def buscar(self):
     if self.activoSelectBus.get()=='ID':
-      try:
-        id=float(self.IDBus.get())
+        try:
 
-      except:
-        messagebox.showwarning('ID','El ID debe ser un número.')
-        self.IDBus.set('')
-        
-        #self.primerID.set('')
-        #self.segunID.set('')
+          id=float(self.IDBus.get())
+          id1=self.segunID.get().strip()
+          id2=self.primerID.get().strip()
+          try:
+            if id1=='' and id2=='':
+              datosOpe=buscarOperacionID(self.IDusuario,id)
+
+              #id operacion, id activo,valor,valor en porcentaje,fecha
+              resultado=f'ID: {datosOpe[0]}\nActivo: {saberActivoID(datosOpe[1])}'\
+                +f'\nValor USD: {datosOpe[2]}\n Valor {datosOpe[3]}%\nFecha: {datosOpe[4]}'
+              self.textRes.insert(INSERT,resultado)
+          except Exception as err:
+                print(err)
+        except:
+          messagebox.showwarning('ID','El ID debe ser un número.')
+          self.IDBus.set('')
+
+          #self.primerID.set('')
+          #self.segunID.set('')
 
     elif self.activoSelectBus.get()=='DIA':
       pass
