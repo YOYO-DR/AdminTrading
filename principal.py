@@ -265,8 +265,8 @@ class VentanaPrincipal:
 
     #valor actual total
     self.valorTotalActuL=Label(self.root,text=f'0 USD / 0%',bg='grey90',\
-      font=('Bahnschrift',14,'bold'),fg='#009929')
-    self.valorTotalActuL.place(x=20,y=525)
+      font=('Bahnschrift',12,'bold'),fg='#009929')
+    self.valorTotalActuL.place(x=25,y=525)
 
     #label total
     self.tituloTotal=Label(self.root,text='Total',bg='grey90',font=('Leelawadee UI Semilight',12,'bold'))
@@ -279,7 +279,7 @@ class VentanaPrincipal:
 
     #valor actual ultimo mes
     self.valorMesActuL=Label(self.root,text=f'0 USD / 0%',bg='grey90',\
-      font=('Bahnschrift',14,'bold'),fg='#009929')
+      font=('Bahnschrift',12,'bold'),fg='#009929')
     self.valorMesActuL.place(x=190,y=525)
 
     #label mes
@@ -293,8 +293,8 @@ class VentanaPrincipal:
 
     #valor actual ultima semana
     self.valorSemActuL=Label(self.root,text=f'0 USD / %0',bg='grey90',\
-      font=('Bahnschrift',14,'bold'),fg='#009929')
-    self.valorSemActuL.place(x=365,y=525)
+      font=('Bahnschrift',12,'bold'),fg='#009929')
+    self.valorSemActuL.place(x=360,y=525)
 
     #label total semana
     self.tituloSemana=Label(self.root,text='Total semana',bg='grey90',\
@@ -444,37 +444,34 @@ class VentanaPrincipal:
     
 
     #-----------------------------------------
-    #canvas de resultado
-    self.resBuscar=Canvas(self.root,width=460,height=170,bg='grey90',bd=2)
-    self.resBuscar.place(x=550,y=200)
-
-    #label resultado
-    self.resBusL=Label(self.root,text=f'Resultado',bg='grey90',\
-      font=('Leelawadee UI Semilight',12))
-    self.resBusL.place(x=740,y=170)
+     #canvas de resultado
+    self.resBuscar=Canvas(self.root,width=465,height=170,bg='grey90',bd=2)
+    self.resBuscar.place(x=550,y=190)
 
 
-    #crear scroll para un cuadro de texto
-    #text de resultado
     #creo un frame parap posicionar con pack()
     self.p_aux=Frame(self.root)
     #lo posiciono
-    self.p_aux.place(x=561,y=211)
-    
+    self.p_aux.place(x=556,y=196)
+
     #creo el scroll dentro del frame
     self.scroll=Scrollbar(self.p_aux)
     #Lo posiciono a la derecha del frame
     self.scroll.pack(side=RIGHT,fill=Y)
 
-    #creo el text dentro del frame
-    self.textRes=Text(self.p_aux,font=\
-      ('Leelawadee UI Semilight',10),width=61,height=9,yscrollcommand=self.scroll.set)
+    #creo list box para los resultados
+    self.resBus=Listbox(self.p_aux,font=\
+      ('Leelawadee UI Semilight',10,'bold'),width=55,height=9,yscrollcommand=self.scroll.set)
+    self.resBus.pack(side=LEFT)
+    
+    #enlazar scroll al listbox
+    self.scroll.config(command=self.resBus.yview)
 
-    #Posiciono la caja de texto a la izquierda del frame
-    self.textRes.pack(side=LEFT)
+    #indico el evento de seleccion
+    # <<ListboxSelect>> evento de seleccion
+    self.resBus.bind('<<ListboxSelect>>',self.opeSeleccionado)
 
-    #enlazar scroll a la text
-    self.scroll.config(command=self.textRes.yview)
+
     
 
 
@@ -861,23 +858,30 @@ ID: {id}'''
       
   def buscar(self):
     if self.activoSelectBus.get()=='ID':
-        try:
 
-          id=float(self.IDBus.get())
+        try:#Verifico que sea un numero o no este vacio
+          self.resBus.delete(0,END)
+          try:
+            id=int(self.IDBus.get())
+          except:
+            messagebox.showwarning('ID','El ID debe ser un número entero.')
           id1=self.segunID.get().strip()
           id2=self.primerID.get().strip()
           try:
             if id1=='' and id2=='':
               datosOpe=buscarOperacionID(self.IDusuario,id)
+              if datosOpe==False:
+                self.resBus.insert(0,f'La operacion con el ID: {id} no existe.')
+              else:
+                #self.resBus.insert(0,'ID: 15 | Activo: BTC | Valor: 3 USD | Fecha: 2022/12/26')
+                resultado=f'ID: {datosOpe[0]} - Activo: {saberActivoID(datosOpe[1])}'\
+                  +f' - Valor: {datosOpe[2]} USD - Fecha: {datosOpe[4]}'
 
-              #id operacion, id activo,valor,valor en porcentaje,fecha
-              resultado=f'ID: {datosOpe[0]}\nActivo: {saberActivoID(datosOpe[1])}'\
-                +f'\nValor USD: {datosOpe[2]}\n Valor {datosOpe[3]}%\nFecha: {datosOpe[4]}'
-              self.textRes.insert(INSERT,resultado)
+                self.resBus.insert(0,resultado)
           except Exception as err:
                 print(err)
         except:
-          messagebox.showwarning('ID','El ID debe ser un número.')
+          messagebox.showwarning('ID','El ID no puede estar vacio y debe ser un número.')
           self.IDBus.set('')
 
           #self.primerID.set('')
@@ -891,7 +895,11 @@ ID: {id}'''
       pass
     elif self.activoSelectBus.get()=='TODO':
       pass
-
+  
+  def opeSeleccionado(self,event):
+    if self.activoSelectBus.get()=='ID':
+      
+      pass
 
 VentanaPrincipal(1)
 

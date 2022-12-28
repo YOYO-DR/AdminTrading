@@ -201,8 +201,14 @@ def buscarOperacionID(idUsuario,id=0,deHasta=[False]):
     for i in cursor:
       #id operacion, id activo,valor,valor en porcentaje,fecha
       ope=[i[0],i[2],i[3],i[4],i[5]]
-    con.close()
-    return ope
+    if len(ope)==0:
+      con.close()
+      return False
+    else:
+      con.close()
+      return ope
+
+
 
 def saberActivoID(id):
   con=conexion()
