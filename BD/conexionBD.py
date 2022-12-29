@@ -184,29 +184,20 @@ def sumaOperSemana(id):
 
   return [suma,por]
 
-def buscarOperacionID(idUsuario,id=0,deHasta=[False]):
+def buscarOperacionID(idUsuario,id=0,deHasta=0):
   con=conexion()
   cursor=con.cursor()
-  if deHasta[0]==True:
-    cursor.execute(f"select * from operaciones where id between {deHasta[1]} and {deHasta[2]};")
-    ope=[]
-    for i in cursor:
-      a=[i[0],i[2],i[3],i[5]]
-      ope.append(a)
+  cursor.execute(f"select * from operaciones where id_usuario={idUsuario} and id={id}")
+  ope=[]
+  for i in cursor:
+    #id operacion, id activo,valor,valor en porcentaje,fecha
+    ope=[i[0],i[2],i[3],i[4],i[5]]
+  if len(ope)==0:
+    con.close()
+    return False
+  else:
     con.close()
     return ope
-  else:
-    cursor.execute(f"select * from operaciones where id_usuario={idUsuario} and id={id}")
-    ope=[]
-    for i in cursor:
-      #id operacion, id activo,valor,valor en porcentaje,fecha
-      ope=[i[0],i[2],i[3],i[4],i[5]]
-    if len(ope)==0:
-      con.close()
-      return False
-    else:
-      con.close()
-      return ope
 
 
 

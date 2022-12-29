@@ -359,11 +359,6 @@ class VentanaPrincipal:
       font=('Leelawadee UI Semilight',12))
     self.IDDeHas.place(x=700,y=105)
 
-    #label opcional
-    self.opcionalID=Label(self.root,text=f'(opcional)',bg='grey90',\
-      font=('Leelawadee UI Semilight',9))
-    self.opcionalID.place(x=855,y=84)
-
     #Entry ID
     self.IDBus=StringVar()
     self.eIDBus=Entry(self.root,textvariable=self.IDBus,width=4)
@@ -372,13 +367,13 @@ class VentanaPrincipal:
 
     #entry primer ID
     self.primerID=StringVar()
-    self.ePrimerIDBus=Entry(self.root,textvariable=self.primerID,width=4)
+    self.ePrimerIDBus=Entry(self.root,textvariable=self.primerID,width=4,bg='grey70')
     self.ePrimerIDBus.config(font=('Leelawadee UI Semilight',11))
     self.ePrimerIDBus.place(x=825,y=107)
 
     #entry segundo ID
     self.segunID=StringVar()
-    self.eSegunIDBus=Entry(self.root,textvariable=self.segunID,width=4)
+    self.eSegunIDBus=Entry(self.root,textvariable=self.segunID,width=4,bg='grey70')
     self.eSegunIDBus.config(font=('Leelawadee UI Semilight',11))
     self.eSegunIDBus.place(x=910,y=107)
 
@@ -471,13 +466,18 @@ class VentanaPrincipal:
     # <<ListboxSelect>> evento de seleccion
     self.resBus.bind('<<ListboxSelect>>',self.opeSeleccionado)
 
+    #boton actualizar
+    self.actuOpeB=Button(self.root,text='Actualizar',font=('Leelawadee UI Semilight',9,'bold'),bg='#92e27a')
+    self.actuOpeB.place(x=710,y=371)
 
-    
-
+    #boton borrar
+    self.actuOpeB=Button(self.root,text='Borrar',font=('Leelawadee UI Semilight',9,'bold'),bg='#ff7676')
+    self.actuOpeB.place(x=790,y=371)
 
     #----------------------------------------------------------------------------------------#
     #--------------------elementos del apartado de actualizar/borrar/logo--------------------#
     #----------------------------------------------------------------------------------------#
+    
     #apartado de actualizar/borrar/logo
     self.operacionesC=Canvas(self.root,width=510,height=180,bg='grey90')
     self.operacionesC.place(x=525,y=410)
@@ -486,15 +486,15 @@ class VentanaPrincipal:
     self.logoVelas=PhotoImage(file=os.path.join(self.carpetaImg,'velas_japonesas.png')).subsample(3)
     Label(self.root,image=self.logoVelas,bg='grey90').place(x=660,y=430)
 
-    """ #label actualizar
+    #label actualizar
     self.actualizarL=Label(self.root,text='¿Desea actualizar la operacion n° ?',bg='grey90',\
       font=('Leelawadee UI Semilight',14,'bold'))
-    self.actualizarL.place(x=535,y=415) """
+    #self.actualizarL.place(x=535,y=415)
     
     #label borrar
     self.actualizarL=Label(self.root,text='¿Desea borrar la operacion n°?',bg='grey90',\
       font=('Leelawadee UI Semilight',14,'bold'))
-    self.actualizarL.place(x=535,y=415)
+    #self.actualizarL.place(x=535,y=415)
 
     self.root.mainloop()
 
@@ -777,7 +777,6 @@ ID: {id}'''
     elif seleccion=='DIA':
       #cosas ID
       self.IDDeHas.place_forget()
-      self.opcionalID.place_forget()
       self.eIDBus.place_forget()
       self.ePrimerIDBus.place_forget()
       self.eSegunIDBus.place_forget()
@@ -794,7 +793,6 @@ ID: {id}'''
     elif seleccion=='MES':
       #cosas ID
       self.IDDeHas.place_forget()
-      self.opcionalID.place_forget()
       self.eIDBus.place_forget()
       self.ePrimerIDBus.place_forget()
       self.eSegunIDBus.place_forget()
@@ -812,7 +810,6 @@ ID: {id}'''
     elif seleccion=='ACTIVO':
       #cosas ID
       self.IDDeHas.place_forget()
-      self.opcionalID.place_forget()
       self.eIDBus.place_forget()
       self.ePrimerIDBus.place_forget()
       self.eSegunIDBus.place_forget()
@@ -834,7 +831,6 @@ ID: {id}'''
 
       #cosas ID
       self.IDDeHas.place_forget()
-      self.opcionalID.place_forget()
       self.eIDBus.place_forget()
       self.ePrimerIDBus.place_forget()
       self.eSegunIDBus.place_forget()
@@ -857,35 +853,52 @@ ID: {id}'''
       self.activoLBusActi.place_forget()
       
   def buscar(self):
+    self.resBus.delete(0,END)
     if self.activoSelectBus.get()=='ID':
-
         try:#Verifico que sea un numero o no este vacio
-          self.resBus.delete(0,END)
-          try:
-            id=int(self.IDBus.get())
-          except:
-            messagebox.showwarning('ID','El ID debe ser un número entero.')
-          id1=self.segunID.get().strip()
-          id2=self.primerID.get().strip()
-          try:
-            if id1=='' and id2=='':
+          id1=self.primerID.get().strip()
+          id2=self.segunID.get().strip()
+      
+          if self.IDBus.get().strip()!='':
+            self.primerID.set('')
+            self.segunID.set('')
+            try:
+              id=int(self.IDBus.get())
               datosOpe=buscarOperacionID(self.IDusuario,id)
               if datosOpe==False:
                 self.resBus.insert(0,f'La operacion con el ID: {id} no existe.')
               else:
                 #self.resBus.insert(0,'ID: 15 | Activo: BTC | Valor: 3 USD | Fecha: 2022/12/26')
-                resultado=f'ID: {datosOpe[0]} - Activo: {saberActivoID(datosOpe[1])}'\
-                  +f' - Valor: {datosOpe[2]} USD - Fecha: {datosOpe[4]}'
-
+                resultado=f'ID: {datosOpe[0]} - Activo: {str(saberActivoID(datosOpe[1])).upper()}'\
+                +f' - Valor: {datosOpe[2]} USD - Fecha: {datosOpe[4]}'
                 self.resBus.insert(0,resultado)
-          except Exception as err:
-                print(err)
+                self.IDBus.set('')
+            except:
+              messagebox.showwarning('ID','El ID debe ser un número entero.')
+          elif (id1!='' and id2=='') or (id1=='' and id2!=''):
+            messagebox.showwarning('ID','Falta un ID.')
+          else:
+            try:
+              id1=int(id1)
+              id2=int(id2)
+              if id1>id2:
+                messagebox.showerror('ID','El primer ID no puede ser mayor al segundo.')
+                self.primerID.set('')
+                self.segunID.set('')
+              else:
+                for i in range(id1, id2+1):
+                  a=buscarOperacionID(self.IDusuario,i)
+                  if a!=False:
+                    b=f'ID: {a[0]} - Activo: {str(saberActivoID(a[1])).upper()} - Valor: {a[2]} USD - Fecha: {a[4]}'
+                    self.resBus.insert(0,b)
+                self.primerID.set('')
+                self.segunID.set('')
+            except:
+              messagebox.showwarning('ID','Los ID deben ser letras.')
+
         except:
           messagebox.showwarning('ID','El ID no puede estar vacio y debe ser un número.')
           self.IDBus.set('')
-
-          #self.primerID.set('')
-          #self.segunID.set('')
 
     elif self.activoSelectBus.get()=='DIA':
       pass
@@ -897,9 +910,39 @@ ID: {id}'''
       pass
   
   def opeSeleccionado(self,event):
-    if self.activoSelectBus.get()=='ID':
-      
-      pass
+    def esE(n):
+      try:
+        int(n)
+        return True
+      except:
+        return False
+        
+    #self.resBus.curselection() para mirar el index y .get() para el valor
+    if len(self.resBus.curselection())!=0:#por si se le unde en el cuadro y no hay nada
+
+      a=self.resBus.curselection()[0]#indice del item seleccionado
+      b=self.resBus.get(a)#obtener lo que tiene el item seleccionado
+      id=str(b[4])
+
+      for i in range(5,len(b)):
+        if esE(b[i])==True:
+          id+=b[i]
+        else:
+          break
+      id=int(id)
+
+
+      #print(f'\n{b[5]}')
+
+
+
+
+
+        
+
+
+      #print(f'indice: {self.resBus.curselection()[0]}\nValor: {self.resBus.get(self.resBus.curselection())}')
+        
 
 VentanaPrincipal(1)
 
