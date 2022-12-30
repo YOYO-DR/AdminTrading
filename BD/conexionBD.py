@@ -68,7 +68,7 @@ def obtenActivos():
   con=conexion()
   cursor=con.cursor()
   cursor.execute(f"select * from activo")
-  activos=[]
+  activos=['']
   for i in cursor:
     activos.append(i[1].upper())
   con.close()
@@ -184,12 +184,18 @@ def sumaOperSemana(id):
 
   return [suma,por]
 
-def buscarOperacionID(idUsuario,id=0,deHasta=0):
+def buscarOperacionID(idUsuario,id=0,pos=2):
   con=conexion()
   cursor=con.cursor()
-  cursor.execute(f"select * from operaciones where id_usuario={idUsuario} and id={id}")
+  if pos==False:
+    cursor.execute(f"select * from operaciones where id_usuario={idUsuario} and id={id} and valor<0;")
+  elif pos==True:
+    cursor.execute(f"select * from operaciones where id_usuario={idUsuario} and id={id} and valor>0;")
+  elif pos==2:
+    cursor.execute(f"select * from operaciones where id_usuario={idUsuario} and id={id};")
   ope=[]
   for i in cursor:
+    
     #id operacion, id activo,valor,valor en porcentaje,fecha
     ope=[i[0],i[2],i[3],i[4],i[5]]
   if len(ope)==0:
@@ -198,8 +204,6 @@ def buscarOperacionID(idUsuario,id=0,deHasta=0):
   else:
     con.close()
     return ope
-
-
 
 def saberActivoID(id):
   con=conexion()
@@ -211,8 +215,15 @@ def saberActivoID(id):
   con.close()
   return valor
 
-#buscarOperacionID(1,32)
+def actualizarOperacion(id,idActivo=False,valor=False,fecha=False):
+  con=conexion()
+  cursor=con.cursor()
+  if idActivo!=False:
+    cursor.execute(f'')
+  pass
 
+def borrarOperacion(id):
+  pass
   # tabla operaciones:
   #create table operaciones
   # (

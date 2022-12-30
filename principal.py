@@ -467,12 +467,13 @@ class VentanaPrincipal:
     self.resBus.bind('<<ListboxSelect>>',self.opeSeleccionado)
 
     #boton actualizar
-    self.actuOpeB=Button(self.root,text='Actualizar',font=('Leelawadee UI Semilight',9,'bold'),bg='#92e27a')
-    self.actuOpeB.place(x=710,y=371)
-
+    self.actuOpeB=Button(self.root,text='Actualizar',\
+      font=('Leelawadee UI Semilight',9,'bold'),bg='#92e27a',command=self.actualizarOpe)
+    
     #boton borrar
-    self.actuOpeB=Button(self.root,text='Borrar',font=('Leelawadee UI Semilight',9,'bold'),bg='#ff7676')
-    self.actuOpeB.place(x=790,y=371)
+    self.borrarOpeB=Button(self.root,text='Borrar',\
+      font=('Leelawadee UI Semilight',9,'bold'),bg='#ff7676',command=self.borrarOpe)
+
 
     #----------------------------------------------------------------------------------------#
     #--------------------elementos del apartado de actualizar/borrar/logo--------------------#
@@ -484,21 +485,72 @@ class VentanaPrincipal:
 
     #logo
     self.logoVelas=PhotoImage(file=os.path.join(self.carpetaImg,'velas_japonesas.png')).subsample(3)
-    Label(self.root,image=self.logoVelas,bg='grey90').place(x=660,y=430)
+    self.logoLabel=Label(self.root,image=self.logoVelas,bg='grey90')
+    self.logoLabel.place(x=660,y=430)
 
     #label actualizar
-    self.actualizarL=Label(self.root,text='¿Desea actualizar la operacion n° ?',bg='grey90',\
+    self.actualizarL=Label(self.root,text='¿Desea actualizar la operacion n°?',bg='grey90',\
       font=('Leelawadee UI Semilight',14,'bold'))
-    #self.actualizarL.place(x=535,y=415)
-    
+
     #label borrar
-    self.actualizarL=Label(self.root,text='¿Desea borrar la operacion n°?',bg='grey90',\
+    self.borrarL=Label(self.root,text='¿Desea borrar la operacion n°?',bg='grey90',\
       font=('Leelawadee UI Semilight',14,'bold'))
-    #self.actualizarL.place(x=535,y=415)
 
+    #cosas del boton actualizar
+    #label activo
+    self.activoLActu=Label(self.root,text=f'Activo',bg='grey90',\
+      font=('Leelawadee UI Semilight',12))
+
+    #combobox de activo
+    self.activoSelectActu=StringVar()
+    self.activoOpcionesActu=obtenActivos()
+    self.selectActu=ttk.Combobox(self.root,state='readonly',width=10,\
+      font=('Leelawadee UI Semilight',10),textvariable=self.activoSelectActu,\
+        values=self.activoOpcionesActu)
+    
+    #label valor
+    self.valorLActu=Label(self.root,text=f'Valor',bg='grey90',\
+      font=('Leelawadee UI Semilight',12))
+
+    #entry del valor
+    self.striValor=StringVar()
+    self.eValorActu=Entry(self.root,textvariable=self.striValor,
+    width=12,font=('Leelawadee UI Semilight',11))
+
+    #label fecha
+    self.fechaLActu=Label(self.root,text=f'Fecha (AAAA-MM-DD)',bg='grey90',\
+      font=('Leelawadee UI Semilight',12))
+    
+    
+    #entry de la fecha
+    self.striFecha=StringVar()
+    self.eFechaActu=Entry(self.root,textvariable=self.striFecha,
+    width=12,font=('Leelawadee UI Semilight',11))
+    
+
+    #boton actualizar confirmacion
+    self.actuOpeActu=Button(self.root,text='Actualizar',\
+      font=('Leelawadee UI Semilight',9,'bold'),bg='#92e27a')
+
+    #boton cancelar confirmacion
+    self.cancelarOpeActu=Button(self.root,text='Cancelar',\
+      font=('Leelawadee UI Semilight',9,'bold'),bg='#ff7676')
+
+    #cosas del boton borrar
+
+    #boton borrar confirmacion
+    self.borrarOpeBor=Button(self.root,text='Borrar',\
+      font=('Leelawadee UI Semilight',9,'bold'),bg='#92e27a',width=10)
+
+    #boton cancelar borrado confirmacion
+    self.cancelarOpeBor=Button(self.root,text='Cancelar',\
+      font=('Leelawadee UI Semilight',9,'bold'),bg='#ff7676',width=10)
+    
+    #label muestreo de operacion
+    self.mostrarOpeBor=Label(self.root,text='Operacion a borrar: \n{res}',bg='grey90',\
+      font=('Leelawadee UI Semilight',12))
+    
     self.root.mainloop()
-
-
 
 #-----------------------funciones del apartado de la barra-----------------------#
   def actuaInicio(self):
@@ -686,6 +738,8 @@ ID: {id}'''
     self.striPrecioActu.set('')
     self.activoSelectCal.set('')
 
+    self.resMultiL.config(text='0')
+
 #--------------------funciones del apartado de ganancias/perdidas--------------------#
   
   def ganPerValores(self):
@@ -726,15 +780,16 @@ ID: {id}'''
   def seleccionBus(self,event):
     if self.activoSelectBus.get()=='ID':
       self.limpiarBus('ID')
+      self.limpiarOpcionesActuBor()
 
       self.IDDeHas.place(x=700,y=105)
-      self.opcionalID.place(x=855,y=84)
       self.eIDBus.place(x=720,y=107)
       self.ePrimerIDBus.place(x=825,y=107)
       self.eSegunIDBus.place(x=910,y=107)
 
     elif self.activoSelectBus.get()=='DIA':
       self.limpiarBus('DIA')
+      self.limpiarOpcionesActuBor()
       self.activoLBus.place(x=865,y=85)
       self.selectActivoDia.place(x=865,y=110)
       self.ponerDia.place(x=730,y=85)
@@ -742,6 +797,7 @@ ID: {id}'''
     
     elif self.activoSelectBus.get()=='MES':
       self.limpiarBus('MES')
+      self.limpiarOpcionesActuBor()
       self.activoLBusMes.place(x=865,y=85)
       self.selectActivoMes.place(x=865,y=110)
       self.ponerMes.place(x=730,y=85)
@@ -749,11 +805,16 @@ ID: {id}'''
 
     elif self.activoSelectBus.get()=='ACTIVO':
       self.limpiarBus('ACTIVO')
+      self.limpiarOpcionesActuBor()
       self.selectActivoOp.place(x=730,y=110)
       self.activoLBusActi.place(x=730,y=85)
     
     elif self.activoSelectBus.get()=='TODO':
       self.limpiarBus('TODO')
+      self.limpiarOpcionesActuBor()
+    self.actuOpeB.place_forget()
+    self.borrarOpeB.place_forget()
+    self.resBus.delete(0,END)
 
   def limpiarBus(self,seleccion):
     if seleccion=='ID':
@@ -853,25 +914,40 @@ ID: {id}'''
       self.activoLBusActi.place_forget()
       
   def buscar(self):
+    #limpio la lista
     self.resBus.delete(0,END)
-    if self.activoSelectBus.get()=='ID':
-        try:#Verifico que sea un numero o no este vacio
+    self.logoLabel.place(x=660,y=430)
+    
+    #limpiar abajo
+    self.limpiarOpcionesActuBor()
+    #verifico que modo de buscar esta seleccionado
+    if self.activoSelectBus.get()=='ID': 
+        try: #Verifico que sea un numero entero
+
           id1=self.primerID.get().strip()
           id2=self.segunID.get().strip()
-      
-          if self.IDBus.get().strip()!='':
+
+          if self.IDBus.get().strip()=='' and id1=='' and id2=='':
+            messagebox.showwarning('ID','El ID no debe estar vacio.')
+
+          elif self.IDBus.get().strip()!='' and id1=='' and id2=='':
             self.primerID.set('')
             self.segunID.set('')
-            try:
+            try: #verificar que sea un numero y no otro caracter
               id=int(self.IDBus.get())
-              datosOpe=buscarOperacionID(self.IDusuario,id)
+              #busco la operacion
+              datosOpe=buscarOperacionID(self.IDusuario,id) 
               if datosOpe==False:
                 self.resBus.insert(0,f'La operacion con el ID: {id} no existe.')
               else:
                 #self.resBus.insert(0,'ID: 15 | Activo: BTC | Valor: 3 USD | Fecha: 2022/12/26')
+                #hago el mensaje a mostrar
                 resultado=f'ID: {datosOpe[0]} - Activo: {str(saberActivoID(datosOpe[1])).upper()}'\
                 +f' - Valor: {datosOpe[2]} USD - Fecha: {datosOpe[4]}'
+
+                #inserto el dato
                 self.resBus.insert(0,resultado)
+                #limpio el entry del ID
                 self.IDBus.set('')
             except:
               messagebox.showwarning('ID','El ID debe ser un número entero.')
@@ -885,19 +961,32 @@ ID: {id}'''
                 messagebox.showerror('ID','El primer ID no puede ser mayor al segundo.')
                 self.primerID.set('')
                 self.segunID.set('')
+                
               else:
-                for i in range(id1, id2+1):
-                  a=buscarOperacionID(self.IDusuario,i)
-                  if a!=False:
-                    b=f'ID: {a[0]} - Activo: {str(saberActivoID(a[1])).upper()} - Valor: {a[2]} USD - Fecha: {a[4]}'
-                    self.resBus.insert(0,b)
-                self.primerID.set('')
-                self.segunID.set('')
+                if self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==0:
+                  messagebox.showwarning('Positivo y Negativo',\
+                    'Debe seleccionar si quiere ver operaciones negativas y/o positivas')
+                else:
+                  if self.valorCheckNeg.get()==1 and self.valorCheckPos.get()==1:
+                    pos=2
+                  elif self.valorCheckNeg.get()==1 and self.valorCheckPos.get()==0:
+                    pos=False
+                  elif self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==1:
+                    pos=True
+                    
+                  for i in range(id2, id1-1,-1):
+                    a=buscarOperacionID(self.IDusuario,i,pos)
+                    if a!=False:
+                      b=f'ID: {a[0]} - Activo: {str(saberActivoID(a[1])).upper()} - Valor: {a[2]} USD - Fecha: {a[4]}'
+                      self.resBus.insert(0,b)
+                  self.primerID.set('')
+                  self.segunID.set('')
+                  self.IDBus.set('')
             except:
-              messagebox.showwarning('ID','Los ID deben ser letras.')
+              messagebox.showwarning('ID','Los ID no deben ser letras o estar vacios.')
 
         except:
-          messagebox.showwarning('ID','El ID no puede estar vacio y debe ser un número.')
+          messagebox.showwarning('ID','El ID debe ser un número entero.')
           self.IDBus.set('')
 
     elif self.activoSelectBus.get()=='DIA':
@@ -908,42 +997,101 @@ ID: {id}'''
       pass
     elif self.activoSelectBus.get()=='TODO':
       pass
+    self.actuOpeB.place_forget()
+    self.borrarOpeB.place_forget()
   
   def opeSeleccionado(self,event):
+
     def esE(n):
       try:
         int(n)
         return True
       except:
         return False
-        
     #self.resBus.curselection() para mirar el index y .get() para el valor
     if len(self.resBus.curselection())!=0:#por si se le unde en el cuadro y no hay nada
-
+      #borrar seleccion anterior
+      self.limpiarOpcionesActuBor()
       a=self.resBus.curselection()[0]#indice del item seleccionado
       b=self.resBus.get(a)#obtener lo que tiene el item seleccionado
-      id=str(b[4])
+      if not 'La operacion con el ID' in b:
+        id=str(b[4])
+        #obtener ID
+        for i in range(5,len(b)):
+          if esE(b[i])==True:
+            id+=b[i]
+          else:
+            break
+        self.idSelect=id=int(id)
+        #ubicaciones de los botones
+        self.actuOpeB.place(x=710,y=371)
+        self.borrarOpeB.place(x=790,y=371)
 
-      for i in range(5,len(b)):
-        if esE(b[i])==True:
-          id+=b[i]
-        else:
-          break
-      id=int(id)
+  def actualizarOpe(self):
+    self.logoLabel.place_forget()
+    
+    #cosas de borrar
+    self.borrarL.place_forget()
+    self.mostrarOpeBor.place_forget()
+    self.borrarOpeBor.place_forget()
+    self.cancelarOpeBor.place_forget()
 
+    self.actualizarL.config(text=f'¿Desea actualizar la operacion con el ID: {self.idSelect}?')
+    self.actualizarL.place(x=535,y=410)
 
-      #print(f'\n{b[5]}')
+    self.activoLActu.place(x=555,y=435)
+    self.selectActu.place(x=555,y=460)
+    self.valorLActu.place(x=555,y=485)
+    self.eValorActu.place(x=555,y=510)
+    self.eFechaActu.place(x=555,y=560)
+    self.fechaLActu.place(x=555,y=535)
+    self.actuOpeActu.place(x=750,y=455)
+    self.cancelarOpeActu.place(x=750,y=505)
+    
+    pass
 
+  def borrarOpe(self):
+    self.logoLabel.place_forget()
 
+    #valores de actualizar
+    self.actualizarL.place_forget()
+    self.activoLActu.place_forget()
+    self.selectActu.place_forget()
+    self.valorLActu.place_forget()
+    self.eValorActu.place_forget()
+    self.eFechaActu.place_forget()
+    self.fechaLActu.place_forget()
+    self.actuOpeActu.place_forget()
+    self.cancelarOpeActu.place_forget()
 
+    self.borrarL.config(text=f'¿Desea borrar la operacion con el ID: {self.idSelect}?')
+    self.borrarL.place(x=535,y=410)
+    self.mostrarOpeBor.place(x=570,y=440)
+    a=buscarOperacionID(self.IDusuario,self.idSelect)
+    res=f'ID: {a[0]} - Activo: {str(saberActivoID(a[1])).upper()} - Valor: {a[2]} USD - Fecha: {a[4]}'
+    self.mostrarOpeBor.config(text=f'Operacion a borrar: \n{res}')
+    self.borrarOpeBor.place(x=680,y=500)
+    self.cancelarOpeBor.place(x=790,y=500)
+  
+  def limpiarOpcionesActuBor(self):
+    #valores de actualziar
+    self.activoLActu.place_forget()
+    self.selectActu.place_forget()
+    self.valorLActu.place_forget()
+    self.eValorActu.place_forget()
+    self.eFechaActu.place_forget()
+    self.fechaLActu.place_forget()
+    self.actuOpeActu.place_forget()
+    self.cancelarOpeActu.place_forget()
+    self.actualizarL.place_forget()
 
+    #valores de borrar
+    self.borrarL.place_forget()
+    self.mostrarOpeBor.place_forget()
+    self.borrarOpeBor.place_forget()
+    self.cancelarOpeBor.place_forget()
 
-        
-
-
-      #print(f'indice: {self.resBus.curselection()[0]}\nValor: {self.resBus.get(self.resBus.curselection())}')
-        
+    #mostrar logo
+    self.logoLabel.place(x=660,y=430)
 
 VentanaPrincipal(1)
-
-

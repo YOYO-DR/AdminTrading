@@ -1,3 +1,4 @@
+\
 from tkinter import *
 import os
 from BD.conexionBD import *
@@ -20,21 +21,26 @@ class VentanaLogin:
     #logo de la ventana
     self.login.iconbitmap(os.path.join(self.carpetaMedia,'icono.ico'))
 #----------------------------------------------------------------#
-    self.bienvenida=Label(self.login,bg='#a6a6a6', text='¡BIENVENIDO!\nInicia sesión',font=('Leelawadee UI Semilight',20)).place(x=120,y=180)
+    self.bienvenida=Label(self.login,bg='#a6a6a6', text='¡BIENVENIDO!\nInicia sesión',\
+    font=('Leelawadee UI Semilight',20)).place(x=120,y=180)
 
     #Foto de bienvenida
     self.fotoB=PhotoImage(file=os.path.join(self.carpetaMedia,'imgInicio.png')).subsample(3)
     Label(self.login,image=self.fotoB).place(x=120,y=10)
 
     #Entry de usuario
-    self.nombre=Label(self.login,bg='#a6a6a6', text='Usuario:',font=('Leelawadee UI Semilight',15)).place(x=52,y=274)
+    self.nombre=Label(self.login,bg='#a6a6a6', text='Usuario:',\
+    font=('Leelawadee UI Semilight',15)).place(x=52,y=274)
     self.ValorUsuario=StringVar()
-    self.usuario=Entry(self.login,width=18,bg='#8c8c8c',font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorUsuario).place(x=130,y=280)
+    self.usuario=Entry(self.login,width=18,bg='#8c8c8c',\
+    font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorUsuario).place(x=130,y=280)
 
     #entry de contraseña
-    self.contraseña=Label(self.login,bg='#a6a6a6', text='Contraseña:',font=('Leelawadee UI Semilight',15)).place(x=20,y=311)
+    self.contraseña=Label(self.login,bg='#a6a6a6', text='Contraseña:',\
+    font=('Leelawadee UI Semilight',15)).place(x=20,y=311)
     self.ValorContraseña=StringVar()
-    self.contraseña=Entry(self.login,width=18,bg='#8c8c8c',font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorContraseña,show='*').place(x=130,y=316)
+    self.contraseña=Entry(self.login,width=18,bg='#8c8c8c',\
+    font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorContraseña,show='*').place(x=130,y=316)
 
     
 
@@ -70,8 +76,8 @@ class VentanaLogin:
     elif usuario!='' and contraseña == '':
       messagebox.showerror('Contraseña', 'Contraseña no puede estar vacio.')
     elif not buscarUsuario(usuario):
-      messagebox.showwarning('Inicio se sesión','''No se encontro el usuario, vuelve a intentar. 
-Si es nuevo, presiona en registrar para crear un usuario.''')
+      messagebox.showwarning('Inicio se sesión',\
+        'No se encontro el usuario, vuelve a intentar. \nSi es nuevo, presiona en registrar para crear un usuario.')
       self.ValorUsuario.set('')
       self.ValorContraseña.set('')
     else:
@@ -111,32 +117,41 @@ class VentanaRegistro:
     #logo de la ventana
     self.registro.iconbitmap(os.path.join(self.carpetaMedia,'icono.ico'))
 #----------------------------------------------------------------#
-    self.bienvenida=Label(self.registro,bg='#a6a6a6', text='Registro',font=('Leelawadee UI Semilight',20)).place(x=160,y=180)
+    self.bienvenida=Label(self.registro,bg='#a6a6a6', text='Registro',\
+    font=('Leelawadee UI Semilight',20)).place(x=160,y=180)
 
     #Foto de bienvenida
     self.fotoB=PhotoImage(file=os.path.join(self.carpetaLogin,'signup_100_2.png')).zoom(2)
     Label(self.registro,image=self.fotoB,bd=0).place(x=105,y=-10)
 
     #Entry de usuario
-    self.nombre=Label(self.registro,bg='#a6a6a6', text='Usuario:',font=('Leelawadee UI Semilight',15)).place(x=117,y=234)
+    self.nombre=Label(self.registro,bg='#a6a6a6', text='Usuario:',\
+    font=('Leelawadee UI Semilight',15)).place(x=117,y=234)
     self.ValorUsuario=StringVar()
-    self.usuario=Entry(self.registro,width=18,bg='#8c8c8c',font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorUsuario)
+    self.usuario=Entry(self.registro,width=18,bg='#8c8c8c',\
+    font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorUsuario)
     self.usuario.place(x=195,y=240)
 
     #entry de contraseña
-    self.contraseña=Label(self.registro,bg='#a6a6a6', text='Contraseña:',font=('Leelawadee UI Semilight',15)).place(x=85,y=271)
+    self.contraseña=Label(self.registro,bg='#a6a6a6', text='Contraseña:',\
+    font=('Leelawadee UI Semilight',15)).place(x=85,y=271)
     self.ValorContraseña=StringVar()
-    self.contraseña=Entry(self.registro,width=18,bg='#8c8c8c',font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorContraseña,show='*').place(x=195,y=276)
+    self.contraseña=Entry(self.registro,width=18,bg='#8c8c8c',\
+    font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorContraseña,show='*').place(x=195,y=276)
    
    #entry de confirmacion de contraseña
-    self.confiContra=Label(self.registro,bg='#a6a6a6', text='Confirmar contraseña:',font=('Leelawadee UI Semilight',15)).place(x=1,y=306)
+    self.confiContra=Label(self.registro,bg='#a6a6a6', text='Confirmar contraseña:',\
+    font=('Leelawadee UI Semilight',15)).place(x=1,y=306)
     self.ValorConfiContra=StringVar()
-    self.confiContra=Entry(self.registro,width=18,bg='#8c8c8c',font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorConfiContra,show='*').place(x=195,y=311)
+    self.confiContra=Entry(self.registro,width=18,bg='#8c8c8c',\
+    font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorConfiContra,show='*').place(x=195,y=311)
 
     #entry de valor inicial de la cuenta
-    self.valorInicial=Label(self.registro,bg='#a6a6a6', text='Valor de la cuenta:',font=('Leelawadee UI Semilight',15)).place(x=30,y=345)
+    self.valorInicial=Label(self.registro,bg='#a6a6a6', text='Valor de la cuenta:',\
+    font=('Leelawadee UI Semilight',15)).place(x=30,y=345)
     self.ValorInicialC=StringVar()
-    self.valorInicial=Entry(self.registro,width=18,bg='#8c8c8c',font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorInicialC).place(x=195,y=351)
+    self.valorInicial=Entry(self.registro,width=18,bg='#8c8c8c',\
+    font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorInicialC).place(x=195,y=351)
     self.ValorInicialC.set('0')
 
     #boton registrar
@@ -194,7 +209,8 @@ class VentanaRegistro:
       messagebox.showwarning('Confirmacion','La confirmacion, no puede estar vacio.')
       #Terminar ventana de registro
     elif len(contraseña)<8 or len(contraseña)>12:
-      messagebox.showerror('Tamaño contraseña','La contraseña debe ser de minimo 8 y maximo de 12 caracteres.')
+      messagebox.showerror('Tamaño contraseña',\
+        'La contraseña debe ser de minimo 8 y maximo de 12 caracteres.')
       self.ValorContraseña.set('')
       self.ValorConfiContra.set('')
     elif contraseña!=confi:
