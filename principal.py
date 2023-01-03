@@ -788,6 +788,8 @@ ID: {id}'''
       self.eSegunIDBus.place(x=910,y=107)
 
     elif self.activoSelectBus.get()=='DIA':
+      self.activoSelectDia.set('')
+      self.ponerDiaE.set('')
       self.limpiarBus('DIA')
       self.limpiarOpcionesActuBor()
       self.activoLBus.place(x=865,y=85)
@@ -990,7 +992,54 @@ ID: {id}'''
           self.IDBus.set('')
 
     elif self.activoSelectBus.get()=='DIA':
-      pass
+
+      #verifivar checkbox
+      if self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==0:
+        messagebox.showwarning('Positivo y Negativo',\
+                                'Debe seleccionar si quiere ver operaciones negativas y/o positivas')
+      else:
+
+        diaPuesto=self.ponerDiaE.get().strip() #dia escrito por la persona
+        if diaPuesto=='':
+          messagebox.showwarning('Fecha','Debe ingresar la fecha del dia a buscar')
+        else:
+        #validar fecha escrita
+          try:
+            datetime.strptime(diaPuesto, '%Y-%m-%d')
+            if self.activoSelectDia.get()=='': #activo que selecciona la persona que es opcional
+              if self.valorCheckNeg.get()==1 and self.valorCheckPos.get()==0:
+                operaciones=buscarOpeDia(self.IDusuario,diaPuesto,pos=False)
+              elif self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==1:
+                operaciones=buscarOpeDia(self.IDusuario,diaPuesto,pos=True)
+              else:
+                operaciones=buscarOpeDia(self.IDusuario,diaPuesto)
+              for i in operaciones:
+                resultado=f'ID: {i[0]} - Activo: {str(i[2]).upper()} - Valor: {float(i[1])} USD - Fecha: {str(i[3])}'
+                #inserto el dato
+                self.resBus.insert(0,resultado)
+            elif self.activoSelectDia.get()!='':
+              activo=self.activoSelectDia.get().strip()
+
+              if self.valorCheckNeg.get()==1 and self.valorCheckPos.get()==0:
+                operaciones=buscarOpeDia(self.IDusuario,diaPuesto,activo,False)
+              elif self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==1:
+                operaciones=buscarOpeDia(self.IDusuario,diaPuesto,activo,True)
+              else:
+                operaciones=buscarOpeDia(self.IDusuario,diaPuesto,activo)
+
+              for i in operaciones:
+                resultado=f'ID: {i[0]} - Activo: {str(i[2]).upper()} - Valor: {float(i[1])} USD - Fecha: {str(i[3])}'
+                #inserto el dato
+                self.resBus.insert(0,resultado)
+
+          except Exception as e:
+            a=str(e)
+            if 'unconverted' in a:
+              messagebox.showwarning('Ingreso dia','La fecha no existe')
+            elif 'time data' in a:
+              messagebox.showerror('Ingreso dia','Fecha invalida')
+              self.ponerDiaE.set('')
+
     elif self.activoSelectBus.get()=='MES':
       pass
     elif self.activoSelectBus.get()=='ACTIVO':
