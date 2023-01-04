@@ -198,7 +198,7 @@ def sumaOperSemana(id):
     else:
       anioMes=f'{localT.tm_year}-{int(localT.tm_mon)}'
     
-  cursor.execute(f"select o.id, o.valor,a.nombre_activo activo,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario=1 and o.fecha > '{anioMes}-{inicioS}';")
+  cursor.execute(f"select o.id, o.valor,a.nombre_activo activo,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id} and o.fecha > '{anioMes}-{inicioS}';")
   suma=0
   for i in cursor:
     suma+=float(i[1])
@@ -206,8 +206,7 @@ def sumaOperSemana(id):
 
   ValorIniSemana=float(obtenerValorActual(id))-suma
   por=(suma/ValorIniSemana)*100
-
-  return [suma,por,anioMes,inicioS]
+  return [suma,por]
 
 def buscarOperacionID(idUsuario,id=0,pos=2):
   con=conexion()
@@ -268,19 +267,104 @@ def buscarOpeDia(id,dia,activo='',pos=2):
     ope=[]
     for i in cursor:
       ope.append(i)
- 
+    con.close()
     return ope
 
-def actualizarOperacion(id,idActivo=False,valor=False,fecha=False):
+def buscarOpeMes(id,dia,activo='',pos=2):
   con=conexion()
   cursor=con.cursor()
-  if idActivo!=False:
-    cursor.execute(f'')
-  pass
+  if activo=='':
+    if pos==True:
+      cursor.execute(f'select o.id, o.valor,a.nombre_activo activo,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id} and o.fecha like "{dia}%" and o.valor>0')
+    elif pos==False:
+      cursor.execute(f'select o.id, o.valor,a.nombre_activo activo,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id} and o.fecha like "{dia}%" and o.valor<0')
+    elif pos==2:
+      cursor.execute(f'select o.id, o.valor,a.nombre_activo activo,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id} and o.fecha like "{dia}%"')
+
+    ope=[]
+    for i in cursor:
+      ope.append(i)
+    con.close()
+    return ope
+  elif activo!='':
+
+    if pos==True:
+      cursor.execute(f'select o.id, o.valor,a.nombre_activo activo,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id} and o.fecha like "{dia}%" and o.valor>0 and a.nombre_activo="{activo}"')
+    elif pos==False:
+      cursor.execute(f'select o.id, o.valor,a.nombre_activo activo,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id} and o.fecha like "{dia}%" and o.valor<0 and a.nombre_activo="{activo}"')
+    elif pos==2:
+      cursor.execute(f'select o.id, o.valor,a.nombre_activo activo,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id} and o.fecha like "{dia}%" and a.nombre_activo="{activo}"')
+
+    ope=[]
+    for i in cursor:
+      ope.append(i)
+    con.close()
+    return ope
+
+def buscarOpeActivo(id,activo,pos=2):
+  con=conexion()
+  cursor=con.cursor()
+  if pos==True:
+    cursor.execute(f'select o.id, o.valor,a.nombre_activo activo,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id} and a.nombre_activo="{activo}" and o.valor>0')
+  elif pos==False:
+    cursor.execute(f'select o.id, o.valor,a.nombre_activo activo,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id} and a.nombre_activo="{activo}" and o.valor<0')
+  elif pos==2:
+    cursor.execute(f'select o.id, o.valor,a.nombre_activo activo,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id} and a.nombre_activo="{activo}"')
+
+  ope=[]
+  for i in cursor:
+    ope.append(i)
+  con.close()
+  return ope
+
+def buscarOpeTodo(id,pos=2):
+  con=conexion()
+  cursor=con.cursor()
+  if pos==True:
+    cursor.execute(f'select o.id, o.valor,a.nombre_activo activo,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id} and o.valor>0')
+  elif pos==False:
+    cursor.execute(f'select o.id, o.valor,a.nombre_activo activo,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id} and o.valor<0')
+  elif pos==2:
+    cursor.execute(f'select o.id, o.valor,a.nombre_activo activo,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id}')
+  
+  ope=[]
+  for i in cursor:
+    ope.append(i)
+  con.close()
+  return ope
+
+def saberActivoValorFecha(idOpe):
+  con=conexion()
+  cursor=con.cursor()
+  cursor.execute(f'select a.nombre_activo,o.valor,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id={idOpe};')
+  for i in cursor:
+    ope=i
+  nombreActivo=ope[0]
+  valor=float(ope[1])
+  fecha=str(ope[2])
+  ope=[nombreActivo,valor,fecha]
+  con.close()
+  return ope
+
+def actualizarOperacion(idOpe,activo,valor,fecha):
+  con=conexion()
+  cursor=con.cursor()
+  cursor.execute(f'select * from activo where nombre_activo="{activo}"')
+  for i in cursor:
+    idActivo=i[0]
+
+  cursor.execute(f'update operaciones set id_activo={idActivo},valor={valor},fecha="{fecha}" where id={idOpe}')
+  con.commit()
+  con.close()
 
 def borrarOperacion(id):
-  pass
-  # tabla operaciones:
+  con=conexion()
+  cursor=con.cursor()
+  cursor.execute(f'delete from operaciones where id={id}')
+  con.commit()
+  con.close()
+
+ # tabla operaciones:
   #create table operaciones
   # (
   # id int auto_increment, 

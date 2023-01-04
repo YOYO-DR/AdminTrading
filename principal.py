@@ -530,21 +530,21 @@ class VentanaPrincipal:
 
     #boton actualizar confirmacion
     self.actuOpeActu=Button(self.root,text='Actualizar',\
-      font=('Leelawadee UI Semilight',9,'bold'),bg='#92e27a')
+      font=('Leelawadee UI Semilight',9,'bold'),bg='#92e27a',command=self.actualizarOpeConfi)
 
     #boton cancelar confirmacion
     self.cancelarOpeActu=Button(self.root,text='Cancelar',\
-      font=('Leelawadee UI Semilight',9,'bold'),bg='#ff7676')
+      font=('Leelawadee UI Semilight',9,'bold'),bg='#ff7676',command=self.buscar)
 
     #cosas del boton borrar
 
     #boton borrar confirmacion
     self.borrarOpeBor=Button(self.root,text='Borrar',\
-      font=('Leelawadee UI Semilight',9,'bold'),bg='#92e27a',width=10)
+      font=('Leelawadee UI Semilight',9,'bold'),bg='#92e27a',width=10,command=self.borrarOpeConfi)
 
     #boton cancelar borrado confirmacion
     self.cancelarOpeBor=Button(self.root,text='Cancelar',\
-      font=('Leelawadee UI Semilight',9,'bold'),bg='#ff7676',width=10)
+      font=('Leelawadee UI Semilight',9,'bold'),bg='#ff7676',width=10,command=self.buscar)
     
     #label muestreo de operacion
     self.mostrarOpeBor=Label(self.root,text='Operacion a borrar: \n{res}',bg='grey90',\
@@ -743,6 +743,8 @@ ID: {id}'''
 #--------------------funciones del apartado de ganancias/perdidas--------------------#
   
   def ganPerValores(self):
+    #actualizar valor actual
+    actualizarValorActual(self.IDusuario)
     #Label de los valores total(0 USD / 0 %)
     #USD
     valorActual=float(obtenerValorActual(self.IDusuario))
@@ -981,6 +983,8 @@ ID: {id}'''
                     if a!=False:
                       b=f'ID: {a[0]} - Activo: {str(saberActivoID(a[1])).upper()} - Valor: {a[2]} USD - Fecha: {a[4]}'
                       self.resBus.insert(0,b)
+                  if self.resBus.get(0)=='':
+                    self.resBus.insert(0,'No se encontraron resultados.')
                   self.primerID.set('')
                   self.segunID.set('')
                   self.IDBus.set('')
@@ -1017,6 +1021,8 @@ ID: {id}'''
                 resultado=f'ID: {i[0]} - Activo: {str(i[2]).upper()} - Valor: {float(i[1])} USD - Fecha: {str(i[3])}'
                 #inserto el dato
                 self.resBus.insert(0,resultado)
+                if self.resBus.get(0)=='':
+                  self.resBus.insert(0,'No se encontraron resultados.')
             elif self.activoSelectDia.get()!='':
               activo=self.activoSelectDia.get().strip()
 
@@ -1031,6 +1037,8 @@ ID: {id}'''
                 resultado=f'ID: {i[0]} - Activo: {str(i[2]).upper()} - Valor: {float(i[1])} USD - Fecha: {str(i[3])}'
                 #inserto el dato
                 self.resBus.insert(0,resultado)
+              if self.resBus.get(0)=='':
+                self.resBus.insert(0,'No se encontraron resultados.')
 
           except Exception as e:
             a=str(e)
@@ -1041,16 +1049,101 @@ ID: {id}'''
               self.ponerDiaE.set('')
 
     elif self.activoSelectBus.get()=='MES':
-      pass
+      #verifivar checkbox
+      if self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==0:
+        messagebox.showwarning('Positivo y Negativo',\
+                                'Debe seleccionar si quiere ver operaciones negativas y/o positivas')
+      else:
+
+        diaPuesto=self.ponerDiaE.get().strip() #dia escrito por la persona
+        if diaPuesto=='':
+          messagebox.showwarning('Fecha','Debe ingresar la fecha del dia a buscar')
+        else:
+        #validar fecha escrita
+          try:
+            datetime.strptime(diaPuesto, '%Y-%m')
+            if self.activoSelectDia.get()=='': #activo que selecciona la persona que es opcional
+              if self.valorCheckNeg.get()==1 and self.valorCheckPos.get()==0:
+                operaciones=buscarOpeMes(self.IDusuario,diaPuesto,pos=False)
+              elif self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==1:
+                operaciones=buscarOpeMes(self.IDusuario,diaPuesto,pos=True)
+              else:
+                operaciones=buscarOpeMes(self.IDusuario,diaPuesto)
+              for i in operaciones:
+                resultado=f'ID: {i[0]} - Activo: {str(i[2]).upper()} - Valor: {float(i[1])} USD - Fecha: {str(i[3])}'
+                #inserto el dato
+                self.resBus.insert(0,resultado)
+              if self.resBus.get(0)=='':
+                self.resBus.insert(0,'No se encontraron resultados.')
+            elif self.activoSelectDia.get()!='':
+              activo=self.activoSelectDia.get().strip()
+
+              if self.valorCheckNeg.get()==1 and self.valorCheckPos.get()==0:
+                operaciones=buscarOpeMes(self.IDusuario,diaPuesto,activo,False)
+              elif self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==1:
+                operaciones=buscarOpeMes(self.IDusuario,diaPuesto,activo,True)
+              else:
+                operaciones=buscarOpeMes(self.IDusuario,diaPuesto,activo)
+
+              for i in operaciones:
+                resultado=f'ID: {i[0]} - Activo: {str(i[2]).upper()} - Valor: {float(i[1])} USD - Fecha: {str(i[3])}'
+                #inserto el dato
+                self.resBus.insert(0,resultado)
+              if self.resBus.get(0)=='':
+                self.resBus.insert(0,'No se encontraron resultados.')
+
+          except Exception as e:
+            a=str(e)
+            if 'unconverted' in a:
+              messagebox.showwarning('Ingreso dia','La fecha no existe')
+            elif 'time data' in a:
+              messagebox.showerror('Ingreso dia','Fecha invalida')
+              self.ponerDiaE.set('')
+      
     elif self.activoSelectBus.get()=='ACTIVO':
-      pass
+      if self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==0:
+        messagebox.showwarning('Positivo y Negativo',\
+                                'Debe seleccionar si quiere ver operaciones negativas y/o positivas')
+      else:
+        activo=self.activoSelectOp.get()
+        if self.activoSelectOp.get()=='':
+          messagebox.showwarning('Seleccion activo','No has seleccionado un activo a buscar.')
+        else:
+          if self.valorCheckNeg.get()==1 and self.valorCheckPos.get()==0:
+            operaciones=buscarOpeActivo(self.IDusuario,activo,pos=False)
+          elif self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==1:
+            operaciones=buscarOpeActivo(self.IDusuario,activo,pos=True)
+          else:
+            operaciones=buscarOpeActivo(self.IDusuario,activo)
+          for i in operaciones:
+            resultado=f'ID: {i[0]} - Activo: {str(i[2]).upper()} - Valor: {float(i[1])} USD - Fecha: {str(i[3])}'
+            #inserto el dato
+            self.resBus.insert(0,resultado)
+          if self.resBus.get(0)=='':
+            self.resBus.insert(0,'No se encontraron resultados.')
+
     elif self.activoSelectBus.get()=='TODO':
-      pass
+      if self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==0:
+        messagebox.showwarning('Positivo y Negativo',\
+                                'Debe seleccionar si quiere ver operaciones negativas y/o positivas')
+      else:
+        if self.valorCheckNeg.get()==1 and self.valorCheckPos.get()==0:
+          operaciones=buscarOpeTodo(self.IDusuario,pos=False)
+        elif self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==1:
+           operaciones=buscarOpeTodo(self.IDusuario,pos=True)
+        else:
+          operaciones=buscarOpeTodo(self.IDusuario)
+        for i in operaciones:
+          resultado=f'ID: {i[0]} - Activo: {str(i[2]).upper()} - Valor: {float(i[1])} USD - Fecha: {str(i[3])}'
+            #inserto el dato
+          self.resBus.insert(0,resultado)
+          if self.resBus.get(0)=='':
+            self.resBus.insert(0,'No se encontraron resultados.')
+
     self.actuOpeB.place_forget()
     self.borrarOpeB.place_forget()
   
   def opeSeleccionado(self,event):
-
     def esE(n):
       try:
         int(n)
@@ -1063,7 +1156,7 @@ ID: {id}'''
       self.limpiarOpcionesActuBor()
       a=self.resBus.curselection()[0]#indice del item seleccionado
       b=self.resBus.get(a)#obtener lo que tiene el item seleccionado
-      if not 'La operacion con el ID' in b:
+      if not 'La operacion con el ID' in b and not 'No se encontraron resultados.' in b:
         id=str(b[4])
         #obtener ID
         for i in range(5,len(b)):
@@ -1071,20 +1164,21 @@ ID: {id}'''
             id+=b[i]
           else:
             break
-        self.idSelect=id=int(id)
+        self.idSelect=int(id)
         #ubicaciones de los botones
         self.actuOpeB.place(x=710,y=371)
         self.borrarOpeB.place(x=790,y=371)
 
   def actualizarOpe(self):
-    self.logoLabel.place_forget()
-    
-    #cosas de borrar
+    #cosas de ocultar
+    self.logoLabel.place_forget() #logo
+
     self.borrarL.place_forget()
     self.mostrarOpeBor.place_forget()
     self.borrarOpeBor.place_forget()
     self.cancelarOpeBor.place_forget()
-
+    
+    #Mostrar cosas del apartado de actualizar
     self.actualizarL.config(text=f'¿Desea actualizar la operacion con el ID: {self.idSelect}?')
     self.actualizarL.place(x=535,y=410)
 
@@ -1096,9 +1190,74 @@ ID: {id}'''
     self.fechaLActu.place(x=555,y=535)
     self.actuOpeActu.place(x=750,y=455)
     self.cancelarOpeActu.place(x=750,y=505)
-    
-    pass
 
+    #poner valores de la operacion seleccionada
+    #valores de la operacion
+    valores=saberActivoValorFecha(self.idSelect)
+
+    activo=valores[0].upper()
+    valor=valores[1]
+    fecha=valores[2]
+
+    self.activoSelectActu.set(activo) #combobox
+    self.striValor.set(valor) #entry valor
+    self.striFecha.set(fecha) #entry fecha
+    
+    #guardar valores anteriores
+    self.activoMessa=activo
+    self.valorMessa=valor
+    self.fechaMessa=fecha
+  
+  def actualizarOpeConfi(self):
+    def esF(n):
+      try:
+        float(n)
+        return True
+      except:
+        return False
+    if self.activoSelectActu.get()=='':
+      messagebox.showwarning('Activo','Debe seleccionar el activo.')
+    elif self.striValor.get().strip()=='':
+      messagebox.showwarning('Valor','Debe ingresar el valor.')
+    elif self.striFecha.get().strip()=='':
+      messagebox.showwarning('Fecha','Debe ingresar la fecha.')
+    else:
+      if esF(self.striValor.get())==False:
+        messagebox.showerror('Valor','El valor debe ser un número.')
+      else:
+        try:
+          fechaIngre=self.striFecha.get()
+          datetime.strptime(fechaIngre, '%Y-%m-%d')
+          #Valores anteriores
+          activoA=self.activoMessa
+          valorA=self.valorMessa
+          fechaA=self.fechaMessa
+          
+          #Valor ingresados por el usuario
+          activo=self.activoSelectActu.get()
+          valor=self.striValor.get()
+          fecha=self.striFecha.get()
+          confi=messagebox.askokcancel('Actualizacion',f'''¿Confirma la actualizacion de la operación?
+De:
+Activo: {activoA} - Valor: {valorA} USD - Fecha: {fechaA}
+A:
+Activo: {activo} - Valor: {valor} USD - Fecha: {fecha}''')
+          if confi==True:
+            try:
+              actualizarOperacion(self.idSelect,activo,valor,fecha)
+              messagebox.showinfo('Actualizacion','Se actualizó correctamente la operacion.')
+              self.buscar()
+              self.ganPerValores()
+            except Exception as e:
+              print(e)
+          else:
+            messagebox.showinfo('Actualizacion','Actualizacion cancelada.')
+            self.buscar()
+
+
+        except:
+          messagebox.showerror('Fecha','Fecha invalida.')
+      
   def borrarOpe(self):
     self.logoLabel.place_forget()
 
@@ -1122,6 +1281,17 @@ ID: {id}'''
     self.borrarOpeBor.place(x=680,y=500)
     self.cancelarOpeBor.place(x=790,y=500)
   
+  def borrarOpeConfi(self):
+    
+    try:
+      borrarOperacion(self.idSelect)
+      messagebox.showinfo('Borrar operacion',f'La operacion con el ID: {self.idSelect} se borro correctamente.')
+    except Exception as e:
+      print(e)
+    self.ganPerValores()
+    self.buscar()
+
+
   def limpiarOpcionesActuBor(self):
     #valores de actualziar
     self.activoLActu.place_forget()
@@ -1143,4 +1313,4 @@ ID: {id}'''
     #mostrar logo
     self.logoLabel.place(x=660,y=430)
 
-VentanaPrincipal(1)
+VentanaPrincipal(4)
