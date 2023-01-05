@@ -5,8 +5,8 @@ from calendar import monthrange
 
 def conexion():
   con = mysql.connector.connect(
-  host='127.0.0.1',
-  user='cel',
+  host='192.168.110.47',
+  user='user',
   password='root',
   port='3306',
   database='adminTrading',
@@ -301,7 +301,6 @@ def buscarOpeMes(id,dia,activo='',pos=2):
       ope.append(i)
     con.close()
     return ope
-
 
 def buscarOpeActivo(id,activo,pos=2):
   con=conexion()

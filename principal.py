@@ -8,8 +8,8 @@ from tkinter import messagebox
 class VentanaPrincipal:
   def __init__(self,id):
     self.root=Tk()
-    #self.root.geometry('1050x600+100+50')
-    self.root.geometry('1050x600+1500+50')
+    self.root.geometry('1050x600+100+50')
+    #self.root.geometry('1050x600+1500+50')
     self.root.resizable(width=False,height=False)
     self.root.title('AdminTrading')
     self.IDusuario=id
@@ -1031,8 +1031,8 @@ ID: {id}'''
                 resultado=f'ID: {i[0]} - Activo: {str(i[2]).upper()} - Valor: {float(i[1])} USD - Fecha: {str(i[3])}'
                 #inserto el dato
                 self.resBus.insert(0,resultado)
-                if self.resBus.get(0)=='':
-                  self.resBus.insert(0,'No se encontraron resultados.')
+              if self.resBus.get(0).strip()=='':
+                self.resBus.insert(0,'No se encontraron resultados.')
             elif self.activoSelectDia.get()!='':
               activo=self.activoSelectDia.get().strip()
 
@@ -1349,4 +1349,4 @@ Activo: {activo} - Valor: {valor} USD - Fecha: {fecha}''')
     #mostrar logo
     self.logoLabel.place(x=660,y=430)
 
-VentanaPrincipal(1)
+#VentanaPrincipal(1)
