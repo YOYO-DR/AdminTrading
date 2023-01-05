@@ -237,4 +237,3 @@ class VentanaRegistro:
 
 if __name__ == '__main__':
   VentanaLogin()
-  #VentanaRegistro()

@@ -8,7 +8,9 @@ from tkinter import messagebox
 class VentanaPrincipal:
   def __init__(self,id):
     self.root=Tk()
+    #self.root.geometry('1050x600+100+50')
     self.root.geometry('1050x600+1500+50')
+    self.root.resizable(width=False,height=False)
     self.root.title('AdminTrading')
     self.IDusuario=id
     #-------------------------------------------------------------------------------#
@@ -421,7 +423,7 @@ class VentanaPrincipal:
     
     #entry de poner el Mes
     self.ponerMesE=StringVar()
-    self.ePonerMes=Entry(self.root,textvariable=self.ponerDiaE,width=11)
+    self.ePonerMes=Entry(self.root,textvariable=self.ponerMesE,width=11)
     self.ePonerMes.config(font=('Leelawadee UI Semilight',11))
 
 #---------------------------------------------------
@@ -473,6 +475,11 @@ class VentanaPrincipal:
     #boton borrar
     self.borrarOpeB=Button(self.root,text='Borrar',\
       font=('Leelawadee UI Semilight',9,'bold'),bg='#ff7676',command=self.borrarOpe)
+    
+    #suma de todas las operaciones
+    self.sumaOpeL=Label(self.root,text=f'Suma: 0 USD',bg='grey90',\
+      font=('Leelawadee UI Semilight',12,'bold'))
+    
 
 
     #----------------------------------------------------------------------------------------#
@@ -977,9 +984,10 @@ ID: {id}'''
                     pos=False
                   elif self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==1:
                     pos=True
-                    
+                  self.operaciones=[]
                   for i in range(id2, id1-1,-1):
                     a=buscarOperacionID(self.IDusuario,i,pos)
+                    self.operaciones.append(a)
                     if a!=False:
                       b=f'ID: {a[0]} - Activo: {str(saberActivoID(a[1])).upper()} - Valor: {a[2]} USD - Fecha: {a[4]}'
                       self.resBus.insert(0,b)
@@ -1010,14 +1018,16 @@ ID: {id}'''
         #validar fecha escrita
           try:
             datetime.strptime(diaPuesto, '%Y-%m-%d')
+            self.operaciones=[]
             if self.activoSelectDia.get()=='': #activo que selecciona la persona que es opcional
+              
               if self.valorCheckNeg.get()==1 and self.valorCheckPos.get()==0:
-                operaciones=buscarOpeDia(self.IDusuario,diaPuesto,pos=False)
+                self.operaciones=buscarOpeDia(self.IDusuario,diaPuesto,pos=False)
               elif self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==1:
-                operaciones=buscarOpeDia(self.IDusuario,diaPuesto,pos=True)
+                self.operaciones=buscarOpeDia(self.IDusuario,diaPuesto,pos=True)
               else:
-                operaciones=buscarOpeDia(self.IDusuario,diaPuesto)
-              for i in operaciones:
+                self.operaciones=buscarOpeDia(self.IDusuario,diaPuesto)
+              for i in self.operaciones:
                 resultado=f'ID: {i[0]} - Activo: {str(i[2]).upper()} - Valor: {float(i[1])} USD - Fecha: {str(i[3])}'
                 #inserto el dato
                 self.resBus.insert(0,resultado)
@@ -1027,13 +1037,13 @@ ID: {id}'''
               activo=self.activoSelectDia.get().strip()
 
               if self.valorCheckNeg.get()==1 and self.valorCheckPos.get()==0:
-                operaciones=buscarOpeDia(self.IDusuario,diaPuesto,activo,False)
+                self.operaciones=buscarOpeDia(self.IDusuario,diaPuesto,activo,False)
               elif self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==1:
-                operaciones=buscarOpeDia(self.IDusuario,diaPuesto,activo,True)
+                self.operaciones=buscarOpeDia(self.IDusuario,diaPuesto,activo,True)
               else:
-                operaciones=buscarOpeDia(self.IDusuario,diaPuesto,activo)
+                self.operaciones=buscarOpeDia(self.IDusuario,diaPuesto,activo)
 
-              for i in operaciones:
+              for i in self.operaciones:
                 resultado=f'ID: {i[0]} - Activo: {str(i[2]).upper()} - Valor: {float(i[1])} USD - Fecha: {str(i[3])}'
                 #inserto el dato
                 self.resBus.insert(0,resultado)
@@ -1055,37 +1065,40 @@ ID: {id}'''
                                 'Debe seleccionar si quiere ver operaciones negativas y/o positivas')
       else:
 
-        diaPuesto=self.ponerDiaE.get().strip() #dia escrito por la persona
+        diaPuesto=self.ponerMesE.get().strip() #dia escrito por la persona
         if diaPuesto=='':
           messagebox.showwarning('Fecha','Debe ingresar la fecha del dia a buscar')
         else:
         #validar fecha escrita
           try:
             datetime.strptime(diaPuesto, '%Y-%m')
-            if self.activoSelectDia.get()=='': #activo que selecciona la persona que es opcional
+            self.operaciones=[]
+            if self.activoSelectMes.get()=='': #activo que selecciona la persona que es opcional
               if self.valorCheckNeg.get()==1 and self.valorCheckPos.get()==0:
-                operaciones=buscarOpeMes(self.IDusuario,diaPuesto,pos=False)
+                self.operaciones=buscarOpeMes(self.IDusuario,diaPuesto,pos=False)
               elif self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==1:
-                operaciones=buscarOpeMes(self.IDusuario,diaPuesto,pos=True)
+                self.operaciones=buscarOpeMes(self.IDusuario,diaPuesto,pos=True)
               else:
-                operaciones=buscarOpeMes(self.IDusuario,diaPuesto)
-              for i in operaciones:
+                self.operaciones=buscarOpeMes(self.IDusuario,diaPuesto)
+              for i in self.operaciones:
                 resultado=f'ID: {i[0]} - Activo: {str(i[2]).upper()} - Valor: {float(i[1])} USD - Fecha: {str(i[3])}'
                 #inserto el dato
                 self.resBus.insert(0,resultado)
               if self.resBus.get(0)=='':
                 self.resBus.insert(0,'No se encontraron resultados.')
-            elif self.activoSelectDia.get()!='':
-              activo=self.activoSelectDia.get().strip()
+
+            elif self.activoSelectMes.get()!='':
+
+              activo=self.activoSelectMes.get().strip()
 
               if self.valorCheckNeg.get()==1 and self.valorCheckPos.get()==0:
-                operaciones=buscarOpeMes(self.IDusuario,diaPuesto,activo,False)
+                self.operaciones=buscarOpeMes(self.IDusuario,diaPuesto,activo,False)
               elif self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==1:
-                operaciones=buscarOpeMes(self.IDusuario,diaPuesto,activo,True)
+                self.operaciones=buscarOpeMes(self.IDusuario,diaPuesto,activo,True)
               else:
-                operaciones=buscarOpeMes(self.IDusuario,diaPuesto,activo)
+                self.operaciones=buscarOpeMes(self.IDusuario,diaPuesto,activo)
 
-              for i in operaciones:
+              for i in self.operaciones:
                 resultado=f'ID: {i[0]} - Activo: {str(i[2]).upper()} - Valor: {float(i[1])} USD - Fecha: {str(i[3])}'
                 #inserto el dato
                 self.resBus.insert(0,resultado)
@@ -1098,7 +1111,7 @@ ID: {id}'''
               messagebox.showwarning('Ingreso dia','La fecha no existe')
             elif 'time data' in a:
               messagebox.showerror('Ingreso dia','Fecha invalida')
-              self.ponerDiaE.set('')
+              self.ponerMesE.set('')
       
     elif self.activoSelectBus.get()=='ACTIVO':
       if self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==0:
@@ -1106,16 +1119,17 @@ ID: {id}'''
                                 'Debe seleccionar si quiere ver operaciones negativas y/o positivas')
       else:
         activo=self.activoSelectOp.get()
+        self.operaciones=[]
         if self.activoSelectOp.get()=='':
           messagebox.showwarning('Seleccion activo','No has seleccionado un activo a buscar.')
         else:
           if self.valorCheckNeg.get()==1 and self.valorCheckPos.get()==0:
-            operaciones=buscarOpeActivo(self.IDusuario,activo,pos=False)
+            self.operaciones=buscarOpeActivo(self.IDusuario,activo,pos=False)
           elif self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==1:
-            operaciones=buscarOpeActivo(self.IDusuario,activo,pos=True)
+            self.operaciones=buscarOpeActivo(self.IDusuario,activo,pos=True)
           else:
-            operaciones=buscarOpeActivo(self.IDusuario,activo)
-          for i in operaciones:
+            self.operaciones=buscarOpeActivo(self.IDusuario,activo)
+          for i in self.operaciones:
             resultado=f'ID: {i[0]} - Activo: {str(i[2]).upper()} - Valor: {float(i[1])} USD - Fecha: {str(i[3])}'
             #inserto el dato
             self.resBus.insert(0,resultado)
@@ -1127,18 +1141,38 @@ ID: {id}'''
         messagebox.showwarning('Positivo y Negativo',\
                                 'Debe seleccionar si quiere ver operaciones negativas y/o positivas')
       else:
+        self.operaciones=[]
         if self.valorCheckNeg.get()==1 and self.valorCheckPos.get()==0:
-          operaciones=buscarOpeTodo(self.IDusuario,pos=False)
+          self.operaciones=buscarOpeTodo(self.IDusuario,pos=False)
         elif self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==1:
-           operaciones=buscarOpeTodo(self.IDusuario,pos=True)
+          self.operaciones=buscarOpeTodo(self.IDusuario,pos=True)
         else:
-          operaciones=buscarOpeTodo(self.IDusuario)
-        for i in operaciones:
+          self.operaciones=buscarOpeTodo(self.IDusuario)
+        for i in self.operaciones:
           resultado=f'ID: {i[0]} - Activo: {str(i[2]).upper()} - Valor: {float(i[1])} USD - Fecha: {str(i[3])}'
             #inserto el dato
           self.resBus.insert(0,resultado)
           if self.resBus.get(0)=='':
             self.resBus.insert(0,'No se encontraron resultados.')
+
+    #suma de cada busqueda:
+    if self.resBus.get(0)!='No se encontraron resultados.' and self.resBus.get(0)!='':
+      if not 'La operacion' in self.resBus.get(0):
+        if self.activoSelectBus.get()=='ID':
+          posicion=2
+        else:
+          posicion=1
+        suma=0
+        for i in self.operaciones:
+          if i==False or i==True:
+            continue
+          suma+=float(i[posicion])
+        suma=round(suma,2)
+        if suma<0:
+          self.sumaOpeL.config(text=f'Suma: {suma} USD',fg='#ff7676')
+        elif suma>0:
+          self.sumaOpeL.config(text=f'Suma: {suma} USD',fg='#009929')
+        self.sumaOpeL.place(x=870,y=150)
 
     self.actuOpeB.place_forget()
     self.borrarOpeB.place_forget()
@@ -1165,6 +1199,9 @@ ID: {id}'''
           else:
             break
         self.idSelect=int(id)
+
+        #ocultar suma
+        self.sumaOpeL.place_forget()
         #ubicaciones de los botones
         self.actuOpeB.place(x=710,y=371)
         self.borrarOpeB.place(x=790,y=371)
@@ -1291,7 +1328,6 @@ Activo: {activo} - Valor: {valor} USD - Fecha: {fecha}''')
     self.ganPerValores()
     self.buscar()
 
-
   def limpiarOpcionesActuBor(self):
     #valores de actualziar
     self.activoLActu.place_forget()
@@ -1313,4 +1349,4 @@ Activo: {activo} - Valor: {valor} USD - Fecha: {fecha}''')
     #mostrar logo
     self.logoLabel.place(x=660,y=430)
 
-VentanaPrincipal(4)
+VentanaPrincipal(1)

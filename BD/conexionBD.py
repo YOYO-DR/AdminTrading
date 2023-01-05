@@ -6,10 +6,11 @@ from calendar import monthrange
 def conexion():
   con = mysql.connector.connect(
   host='127.0.0.1',
-  user='root',
+  user='cel',
   password='root',
   port='3306',
-  database='adminTrading')
+  database='adminTrading',
+  auth_plugin='mysql_native_password')
   cursor = con.cursor()
   cursor.close()
   return con
@@ -300,6 +301,7 @@ def buscarOpeMes(id,dia,activo='',pos=2):
       ope.append(i)
     con.close()
     return ope
+
 
 def buscarOpeActivo(id,activo,pos=2):
   con=conexion()
