@@ -541,7 +541,7 @@ class VentanaPrincipal:
 
     #boton cancelar confirmacion
     self.cancelarOpeActu=Button(self.root,text='Cancelar',\
-      font=('Leelawadee UI Semilight',9,'bold'),bg='#ff7676',command=self.buscar)
+      font=('Leelawadee UI Semilight',9,'bold'),bg='#ff7676',command=self.cancelarConfir)
 
     #cosas del boton borrar
 
@@ -551,11 +551,16 @@ class VentanaPrincipal:
 
     #boton cancelar borrado confirmacion
     self.cancelarOpeBor=Button(self.root,text='Cancelar',\
-      font=('Leelawadee UI Semilight',9,'bold'),bg='#ff7676',width=10,command=self.buscar)
+      font=('Leelawadee UI Semilight',9,'bold'),bg='#ff7676',width=10,command=self.cancelarConfir)
     
     #label muestreo de operacion
-    self.mostrarOpeBor=Label(self.root,text='Operacion a borrar: \n{res}',bg='grey90',\
+    self.mostrarOpeBor=Label(self.root,bg='grey90',\
       font=('Leelawadee UI Semilight',12))
+
+    #label de N° de operaciones buscadas
+    self.mostrarNoOper=Label(self.root,text='N° de operaciones: 20',bg='grey90',\
+      font=('Leelawadee UI Semilight',12))
+    
     
     self.root.mainloop()
 
@@ -823,9 +828,14 @@ ID: {id}'''
     elif self.activoSelectBus.get()=='TODO':
       self.limpiarBus('TODO')
       self.limpiarOpcionesActuBor()
+    
     self.actuOpeB.place_forget()
     self.borrarOpeB.place_forget()
     self.resBus.delete(0,END)
+
+    #ocultar suma y cantidad
+    self.sumaOpeL.place_forget() 
+    self.mostrarNoOper.place_forget()
 
   def limpiarBus(self,seleccion):
     if seleccion=='ID':
@@ -940,6 +950,8 @@ ID: {id}'''
 
           if self.IDBus.get().strip()=='' and id1=='' and id2=='':
             messagebox.showwarning('ID','El ID no debe estar vacio.')
+            self.sumaOpeL.place_forget() 
+            self.mostrarNoOper.place_forget()
 
           elif self.IDBus.get().strip()!='' and id1=='' and id2=='':
             self.primerID.set('')
@@ -950,6 +962,8 @@ ID: {id}'''
               datosOpe=buscarOperacionID(self.IDusuario,id) 
               if datosOpe==False:
                 self.resBus.insert(0,f'La operacion con el ID: {id} no existe.')
+                self.sumaOpeL.place_forget() 
+                self.mostrarNoOper.place_forget()
               else:
                 #self.resBus.insert(0,'ID: 15 | Activo: BTC | Valor: 3 USD | Fecha: 2022/12/26')
                 #hago el mensaje a mostrar
@@ -960,10 +974,16 @@ ID: {id}'''
                 self.resBus.insert(0,resultado)
                 #limpio el entry del ID
                 self.IDBus.set('')
+                self.sumaOpeL.place_forget() 
+                self.mostrarNoOper.place_forget()
             except:
               messagebox.showwarning('ID','El ID debe ser un número entero.')
+              self.sumaOpeL.place_forget() 
+              self.mostrarNoOper.place_forget()
           elif (id1!='' and id2=='') or (id1=='' and id2!=''):
             messagebox.showwarning('ID','Falta un ID.')
+            self.sumaOpeL.place_forget() 
+            self.mostrarNoOper.place_forget()
           else:
             try:
               id1=int(id1)
@@ -972,11 +992,15 @@ ID: {id}'''
                 messagebox.showerror('ID','El primer ID no puede ser mayor al segundo.')
                 self.primerID.set('')
                 self.segunID.set('')
+                self.sumaOpeL.place_forget() 
+                self.mostrarNoOper.place_forget()
                 
               else:
                 if self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==0:
                   messagebox.showwarning('Positivo y Negativo',\
                     'Debe seleccionar si quiere ver operaciones negativas y/o positivas')
+                  self.sumaOpeL.place_forget() 
+                  self.mostrarNoOper.place_forget()
                 else:
                   if self.valorCheckNeg.get()==1 and self.valorCheckPos.get()==1:
                     pos=2
@@ -991,17 +1015,27 @@ ID: {id}'''
                     if a!=False:
                       b=f'ID: {a[0]} - Activo: {str(saberActivoID(a[1])).upper()} - Valor: {a[2]} USD - Fecha: {a[4]}'
                       self.resBus.insert(0,b)
+
                   if self.resBus.get(0)=='':
                     self.resBus.insert(0,'No se encontraron resultados.')
+                    self.sumaOpeL.place_forget() 
+                    self.mostrarNoOper.place_forget()
+                  else:
+                    #muestro la suma
+                    self.sumaOpeMos()
                   self.primerID.set('')
                   self.segunID.set('')
                   self.IDBus.set('')
             except:
               messagebox.showwarning('ID','Los ID no deben ser letras o estar vacios.')
+              self.sumaOpeL.place_forget() 
+              self.mostrarNoOper.place_forget()
 
         except:
           messagebox.showwarning('ID','El ID debe ser un número entero.')
           self.IDBus.set('')
+          self.sumaOpeL.place_forget() 
+          self.mostrarNoOper.place_forget()
 
     elif self.activoSelectBus.get()=='DIA':
 
@@ -1009,11 +1043,15 @@ ID: {id}'''
       if self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==0:
         messagebox.showwarning('Positivo y Negativo',\
                                 'Debe seleccionar si quiere ver operaciones negativas y/o positivas')
+        self.sumaOpeL.place_forget() 
+        self.mostrarNoOper.place_forget()
       else:
 
         diaPuesto=self.ponerDiaE.get().strip() #dia escrito por la persona
         if diaPuesto=='':
           messagebox.showwarning('Fecha','Debe ingresar la fecha del dia a buscar')
+          self.sumaOpeL.place_forget() 
+          self.mostrarNoOper.place_forget()
         else:
         #validar fecha escrita
           try:
@@ -1031,8 +1069,14 @@ ID: {id}'''
                 resultado=f'ID: {i[0]} - Activo: {str(i[2]).upper()} - Valor: {float(i[1])} USD - Fecha: {str(i[3])}'
                 #inserto el dato
                 self.resBus.insert(0,resultado)
+              
               if self.resBus.get(0).strip()=='':
                 self.resBus.insert(0,'No se encontraron resultados.')
+                self.sumaOpeL.place_forget() 
+                self.mostrarNoOper.place_forget()
+              else:
+                #muestro la suma
+                self.sumaOpeMos()
             elif self.activoSelectDia.get()!='':
               activo=self.activoSelectDia.get().strip()
 
@@ -1049,25 +1093,38 @@ ID: {id}'''
                 self.resBus.insert(0,resultado)
               if self.resBus.get(0)=='':
                 self.resBus.insert(0,'No se encontraron resultados.')
+                self.sumaOpeL.place_forget() 
+                self.mostrarNoOper.place_forget()
+              else:
+                #muestro la suma
+                self.sumaOpeMos()
 
           except Exception as e:
             a=str(e)
             if 'unconverted' in a:
               messagebox.showwarning('Ingreso dia','La fecha no existe')
+              self.sumaOpeL.place_forget() 
+              self.mostrarNoOper.place_forget()
             elif 'time data' in a:
               messagebox.showerror('Ingreso dia','Fecha invalida')
               self.ponerDiaE.set('')
+              self.sumaOpeL.place_forget() 
+              self.mostrarNoOper.place_forget()
 
     elif self.activoSelectBus.get()=='MES':
       #verifivar checkbox
       if self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==0:
         messagebox.showwarning('Positivo y Negativo',\
                                 'Debe seleccionar si quiere ver operaciones negativas y/o positivas')
+        self.sumaOpeL.place_forget() 
+        self.mostrarNoOper.place_forget()
       else:
 
         diaPuesto=self.ponerMesE.get().strip() #dia escrito por la persona
         if diaPuesto=='':
           messagebox.showwarning('Fecha','Debe ingresar la fecha del dia a buscar')
+          self.sumaOpeL.place_forget() 
+          self.mostrarNoOper.place_forget()
         else:
         #validar fecha escrita
           try:
@@ -1086,6 +1143,11 @@ ID: {id}'''
                 self.resBus.insert(0,resultado)
               if self.resBus.get(0)=='':
                 self.resBus.insert(0,'No se encontraron resultados.')
+                self.sumaOpeL.place_forget() 
+                self.mostrarNoOper.place_forget()
+              else:
+                #muestro la suma
+                self.sumaOpeMos()
 
             elif self.activoSelectMes.get()!='':
 
@@ -1102,26 +1164,38 @@ ID: {id}'''
                 resultado=f'ID: {i[0]} - Activo: {str(i[2]).upper()} - Valor: {float(i[1])} USD - Fecha: {str(i[3])}'
                 #inserto el dato
                 self.resBus.insert(0,resultado)
+              #muestro la suma
+              self.sumaOpeMos()
               if self.resBus.get(0)=='':
                 self.resBus.insert(0,'No se encontraron resultados.')
+                self.sumaOpeL.place_forget() 
+                self.mostrarNoOper.place_forget()
 
           except Exception as e:
             a=str(e)
             if 'unconverted' in a:
               messagebox.showwarning('Ingreso dia','La fecha no existe')
+              self.sumaOpeL.place_forget() 
+              self.mostrarNoOper.place_forget()
             elif 'time data' in a:
               messagebox.showerror('Ingreso dia','Fecha invalida')
+              self.sumaOpeL.place_forget() 
+              self.mostrarNoOper.place_forget()
               self.ponerMesE.set('')
       
     elif self.activoSelectBus.get()=='ACTIVO':
       if self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==0:
         messagebox.showwarning('Positivo y Negativo',\
                                 'Debe seleccionar si quiere ver operaciones negativas y/o positivas')
+        self.sumaOpeL.place_forget() 
+        self.mostrarNoOper.place_forget()
       else:
         activo=self.activoSelectOp.get()
         self.operaciones=[]
         if self.activoSelectOp.get()=='':
           messagebox.showwarning('Seleccion activo','No has seleccionado un activo a buscar.')
+          self.sumaOpeL.place_forget() 
+          self.mostrarNoOper.place_forget()
         else:
           if self.valorCheckNeg.get()==1 and self.valorCheckPos.get()==0:
             self.operaciones=buscarOpeActivo(self.IDusuario,activo,pos=False)
@@ -1135,11 +1209,18 @@ ID: {id}'''
             self.resBus.insert(0,resultado)
           if self.resBus.get(0)=='':
             self.resBus.insert(0,'No se encontraron resultados.')
+            self.sumaOpeL.place_forget() 
+            self.mostrarNoOper.place_forget()
+          else:
+            #muestro la suma
+            self.sumaOpeMos()
 
     elif self.activoSelectBus.get()=='TODO':
       if self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==0:
         messagebox.showwarning('Positivo y Negativo',\
                                 'Debe seleccionar si quiere ver operaciones negativas y/o positivas')
+        self.sumaOpeL.place_forget() 
+        self.mostrarNoOper.place_forget()
       else:
         self.operaciones=[]
         if self.valorCheckNeg.get()==1 and self.valorCheckPos.get()==0:
@@ -1150,29 +1231,15 @@ ID: {id}'''
           self.operaciones=buscarOpeTodo(self.IDusuario)
         for i in self.operaciones:
           resultado=f'ID: {i[0]} - Activo: {str(i[2]).upper()} - Valor: {float(i[1])} USD - Fecha: {str(i[3])}'
-            #inserto el dato
+          #inserto el dato
           self.resBus.insert(0,resultado)
-          if self.resBus.get(0)=='':
-            self.resBus.insert(0,'No se encontraron resultados.')
-
-    #suma de cada busqueda:
-    if self.resBus.get(0)!='No se encontraron resultados.' and self.resBus.get(0)!='':
-      if not 'La operacion' in self.resBus.get(0):
-        if self.activoSelectBus.get()=='ID':
-          posicion=2
+        if self.resBus.get(0)=='':
+          self.resBus.insert(0,'No se encontraron resultados.')
+          self.sumaOpeL.place_forget() 
+          self.mostrarNoOper.place_forget()
         else:
-          posicion=1
-        suma=0
-        for i in self.operaciones:
-          if i==False or i==True:
-            continue
-          suma+=float(i[posicion])
-        suma=round(suma,2)
-        if suma<0:
-          self.sumaOpeL.config(text=f'Suma: {suma} USD',fg='#ff7676')
-        elif suma>0:
-          self.sumaOpeL.config(text=f'Suma: {suma} USD',fg='#009929')
-        self.sumaOpeL.place(x=870,y=150)
+          #muestro la suma
+          self.sumaOpeMos()
 
     self.actuOpeB.place_forget()
     self.borrarOpeB.place_forget()
@@ -1200,11 +1267,10 @@ ID: {id}'''
             break
         self.idSelect=int(id)
 
-        #ocultar suma
-        self.sumaOpeL.place_forget()
+        
         #ubicaciones de los botones
-        self.actuOpeB.place(x=710,y=371)
-        self.borrarOpeB.place(x=790,y=371)
+        self.actuOpeB.place(x=560,y=371)
+        self.borrarOpeB.place(x=640,y=371)
 
   def actualizarOpe(self):
     #cosas de ocultar
@@ -1328,6 +1394,9 @@ Activo: {activo} - Valor: {valor} USD - Fecha: {fecha}''')
     self.ganPerValores()
     self.buscar()
 
+  def cancelarConfir(self):
+      self.limpiarOpcionesActuBor()
+
   def limpiarOpcionesActuBor(self):
     #valores de actualziar
     self.activoLActu.place_forget()
@@ -1348,5 +1417,30 @@ Activo: {activo} - Valor: {valor} USD - Fecha: {fecha}''')
 
     #mostrar logo
     self.logoLabel.place(x=660,y=430)
+
+  def sumaOpeMos(self):
+     #suma de cada busqueda:
+    if self.resBus.get(0)!='No se encontraron resultados.' and self.resBus.get(0)!='':
+      if not 'La operacion' in self.resBus.get(0):
+        if self.activoSelectBus.get()=='ID':
+          posicion=2
+        else:
+          posicion=1
+        cantidad=0
+        suma=0
+        for i in self.operaciones:
+          if i==False or i==True:
+            continue
+          suma+=float(i[posicion])
+          cantidad+=1
+        suma=round(suma,2)
+        if suma<0:
+          self.sumaOpeL.config(text=f'Suma: {suma} USD',fg='#ff7676')
+        elif suma>0:
+          self.sumaOpeL.config(text=f'Suma: {suma} USD',fg='#009929')
+        self.sumaOpeL.place(x=870,y=150)
+        self.mostrarNoOper.place(x=840,y=370)
+        self.mostrarNoOper.config(text=f'N° de operaciones: {cantidad}')
+
 
 #VentanaPrincipal(1)
