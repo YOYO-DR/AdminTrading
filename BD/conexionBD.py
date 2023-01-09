@@ -5,11 +5,11 @@ from calendar import monthrange
 
 def conexion():
   con = mysql.connector.connect(
-  host='192.168.110.47',
-  user='user',
-  password='root',
+  host='20.168.252.60',
+  user='yoyo',
+  password='119351',
   port='3306',
-  database='adminTrading',
+  database='admintrading',
   auth_plugin='mysql_native_password')
   cursor = con.cursor()
   cursor.close()
