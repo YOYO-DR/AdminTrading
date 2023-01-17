@@ -621,12 +621,12 @@ class VentanaPrincipal:
       try:
         guardarValores(self.valoresGuardar)
         sumarOperacion(round((float(self.valorUsdS.get())),2),self.IDusuario)
-        messagebox.showinfo('Operacion','La operacion se guardo correctamente')
         actualizarValorActual(self.IDusuario)
         self.MValorActual=obtenerValorActual(self.IDusuario)
         self.tituloB.config(text=f'Inicio: {self.valorInicioMostrar}   Actual: {self.MValorActual}')
         self.limpiarOpe()
         self.ganPerValores()
+        messagebox.showinfo('Operacion','La operacion se guardo correctamente')
       except:
         messagebox.showerror('Error','Hubo un error, vuelve a intentarlo.')
     elif self.confirmarVista==False:

@@ -21,6 +21,11 @@ class VentanaLogin:
     #logo de la ventana
     self.login.iconbitmap(os.path.join(self.carpetaMedia,'icono.ico'))
 #----------------------------------------------------------------#
+    #boton para la confirmacion de conexion
+    self.confiConexionB=Button(self.login,width=60,height=1,bg='red',command=self.confiConexion)
+    self.confiConexionB.place(x=-1,y=480)
+    self.confiConexion()
+
     self.bienvenida=Label(self.login,bg='#a6a6a6', text='¡BIENVENIDO!\nInicia sesión',\
     font=('Leelawadee UI Semilight',20)).place(x=120,y=180)
 
@@ -98,6 +103,20 @@ class VentanaLogin:
   #cancelar inicio
   def FCancelar(self):
     self.login.destroy()
+
+  #confirmar conexion a base de datos
+  def confiConexion(self):
+    def confirmar():
+      try:
+        con=conexion()
+        return True
+      except:
+        return False
+    
+    if confirmar()==True:
+      self.confiConexionB.config(bg='green')
+    else:
+      self.confiConexionB.config(bg='red')
 
 #------------------------------------Ventana registro--------------------------------
 

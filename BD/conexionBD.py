@@ -5,18 +5,17 @@ from calendar import monthrange
 
 def conexion():
   con = mysql.connector.connect(
-  host='192.168.110.47',#'20.168.252.60',
-  user='user',#'yoyo',
-  password='root',#'119351',
+  host='20.168.252.60',#'192.168.110.47',
+  user='yoyo',#'user',
+  password='119351',#'root',
   port='3306',
-  database='adminTrading',#'admintrading',
+  database='admintrading',#'adminTrading',
   auth_plugin='mysql_native_password')
   cursor = con.cursor()
   cursor.close()
   return con
 
 def buscarUsuario(nom):
-  ori=nom
   nom=nom.lower().strip()
   con=conexion()
   cur=con.cursor()
