@@ -5,14 +5,16 @@ with open('operaciones.csv', newline='') as File:
   for row in reader:
     ope.append(row)
 
-print('\n',ope[7])
+print('\n',ope[3])
 
 print('\nNombre divisa')
+id=''
 activo=''
 fecha=''
 valor=''
 confi='0'
-for i in range(5,):
+print(len(ope))
+for i in range(5,len(ope)-4):
   p=ope[i][0]
   for a in p:
     if confi=='0':
@@ -28,6 +30,8 @@ for i in range(5,):
       if a =="\t": #salto la segunda tabulacion donde marca que tipo de operacion fue. EJe: \tSell
         confi='3'
         continue
+      id+=a
+      
     elif confi=='3':
       if a =="\t": #salto la tabulacion despues del tipo de operacion (sell - buy). EJe: Sell\t
         confi='4'
@@ -37,7 +41,6 @@ for i in range(5,):
         confi='5'
         continue
       fecha+=a #voy formando la fecha
-
     elif confi=='5':
       if a =="\t": #salto la tabulacion despues de la hora. EJe: 18:43\t
         confi='6'
@@ -72,11 +75,16 @@ for i in range(5,):
         confi='13'
         continue
       valor+=a #voy formando el valor de la operacion
+      
+
     else:
-      print(f"Activo: '{activo.lower()}' - Fecha: '{fecha}' - Valor: '{valor}'")
+      print(f"N°: {i} - ID: {id} - Activo: '{activo.lower()}' - Fecha: '{fecha}' - Valor: '{valor}'")
+      id=''
       activo=''
       fecha=''
       valor=''
       confi='0'
-      break
+      continue
+    
+  
 
