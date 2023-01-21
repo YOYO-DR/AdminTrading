@@ -3,13 +3,25 @@ import time
 from datetime import datetime
 from calendar import monthrange
 
-def conexion():
+""" def conexion():
   con = mysql.connector.connect(
   host='20.168.252.60',#'192.168.110.47',
   user='yoyo',#'user',
   password='119351',#'root',
   port='3306',
-  database='admintrading',#'adminTrading',
+  database='admintrading',
+  auth_plugin='mysql_native_password')
+  cursor = con.cursor()
+  cursor.close()
+  return con """
+
+def conexion():
+  con = mysql.connector.connect(
+  host='192.168.110.47',
+  user='user',
+  password='root',
+  port='3306',
+  database='admintrading',
   auth_plugin='mysql_native_password')
   cursor = con.cursor()
   cursor.close()
@@ -79,10 +91,16 @@ def siguienteID():
   con=conexion()
   cursor=con.cursor()
   idUltimo=0
-  cursor.execute('select max(id) from operaciones;')
+  cursor.execute('select * from operaciones;')
   for i in cursor:
-    idUltimo=i[0]
-  idUltimo+=1
+    idUltimo=i
+  if idUltimo!=0:
+    cursor.execute('select max(id) from operaciones;')
+    for i in cursor:
+      idUltimo=i[0]
+    idUltimo+=1
+  else:
+    idUltimo=1
   con.close()
   return idUltimo
 

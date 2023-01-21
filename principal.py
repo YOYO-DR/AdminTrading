@@ -1,15 +1,18 @@
 from tkinter import *
 import os
-from tkinter import ttk
+from tkinter import ttk,filedialog
 from BD.conexionBD import *
 import time
 from tkinter import messagebox
+from threading import Thread
+from time import sleep
+from LeerarchivosCSV.leerCSV import *
 
 class VentanaPrincipal:
   def __init__(self,id):
     self.root=Tk()
-    self.root.geometry('1050x600+100+50')
-    #self.root.geometry('1050x600+1500+50')
+    #self.root.geometry('1050x600+100+50')
+    self.root.geometry('1050x600+1500+50')
     self.root.resizable(width=False,height=False)
     self.root.title('AdminTrading')
     self.IDusuario=id
@@ -68,9 +71,15 @@ class VentanaPrincipal:
     font=('Leelawadee UI Semilight',8,'bold'),command=self.actuaInicio)
     self.modificarI.place(x=250,y=7)
 
-    #---------------------------------------------------------------------------------#
-    #----------------------elementos del apartado de operaciones----------------------#
-    #---------------------------------------------------------------------------------#
+    #boton para base de datos
+    self.botonVeri=Button(text='Verificar conexion',width=14,height=1,\
+    font=('Leelawadee UI Semilight',10),command=self.conexionABD)
+    self.conexionABD()
+    self.botonVeri.place(x=900,y=7)
+
+    #----------------------------------------------------------------------------------#
+    #------------------elementos del apartado de ingresar operaciones------------------#
+    #----------------------------------------------------------------------------------#
     #apartado de ingresar operaciones
     self.operacionesC=Canvas(self.root,width=500,height=195,bg='grey90')
     self.operacionesC.place(x=10,y=50)
@@ -103,9 +112,9 @@ class VentanaPrincipal:
     self.valorUsdE.place(x=20,y=160)
 
     #boton de vista previa
-    self.botonGuardarOpe=Button(self.root,text='Vista previa',bg='#92e27a',\
+    self.botonGuardarOpeV=Button(self.root,text='Vista previa',bg='#92e27a',\
     font=('Leelawadee UI Semilight',9,'bold'),command=self.verVistaP)
-    self.botonGuardarOpe.place(x=20,y=187)
+    self.botonGuardarOpeV.place(x=20,y=187)
     self.confirmarVista=False
 
     #boton guardar
@@ -147,6 +156,10 @@ class VentanaPrincipal:
     self.vistaPrevia.place(x=201,y=171.5)
     self.vistaPrevia.insert(END,' ')
     self.vistaPrevia.config(state=DISABLED)
+
+    #boton para subir CSV
+    self.botonSiburCSV=Button(self.root,text='Subir CSV',font=('Leelawadee UI Semilight',10,'bold'),bg='#6eb8f5',command=self.ingresarCSV)
+    self.botonSiburCSV.place(x=430,y=58)
 
     #---------------------------------------------------------------------------------#
     #----------------------elementos del apartado de calculadora----------------------#
@@ -337,7 +350,6 @@ class VentanaPrincipal:
     font=('Leelawadee UI Semilight',9,'bold'),command=self.buscar)
     self.botonBuscar.place(x=535,y=145)
 
-
     #checkbox de + y/o -
     self.valorCheckPos=IntVar()
     self.chekPositivo=Checkbutton(self.root,text='+',\
@@ -471,7 +483,6 @@ class VentanaPrincipal:
     #boton actualizar
     self.actuOpeB=Button(self.root,text='Actualizar',\
       font=('Leelawadee UI Semilight',9,'bold'),bg='#92e27a',command=self.actualizarOpe)
-    
     #boton borrar
     self.borrarOpeB=Button(self.root,text='Borrar',\
       font=('Leelawadee UI Semilight',9,'bold'),bg='#ff7676',command=self.borrarOpe)
@@ -613,24 +624,75 @@ class VentanaPrincipal:
       messagebox.showwarning('Error','No es un número lo que ingresaste, formato (0.00)')
       self.botonCancelarOpe()
 
+#------------------------------funciones de la barra------------------------------#
+  def conexionABD(self):
+      try:
+        conexion()
+        confi=True
+      except:
+        confi=False
+      if confi==True:
+        self.botonVeri.config(bg='#92e27a')
+      else:
+        self.botonVeri.config(bg='#ff7676')
 
 #----------------------funciones del apartado de operaciones----------------------#
+  def actuActualGanPer(self):
+    self.MValorActual=obtenerValorActual(self.IDusuario)
+    self.tituloB.config(text=f'Inicio: {self.valorInicioMostrar}   Actual: {self.MValorActual}')
+    self.ganPerValores()
 
   def guardar(self):
+    self.hiloG=Thread(target=self.guardarEspera)
+    self.hiloG.start()
+
+  def guardarEspera(self):
     if self.confirmarVista==True:
+      sleep(0.15)
+      self.desaIngre(True)
       try:
-        guardarValores(self.valoresGuardar)
         sumarOperacion(round((float(self.valorUsdS.get())),2),self.IDusuario)
-        actualizarValorActual(self.IDusuario)
-        self.MValorActual=obtenerValorActual(self.IDusuario)
-        self.tituloB.config(text=f'Inicio: {self.valorInicioMostrar}   Actual: {self.MValorActual}')
+        guardarValores(self.valoresGuardar)
         self.limpiarOpe()
-        self.ganPerValores()
+        self.actuActualGanPer()
+        
+        self.desaIngre(False)
         messagebox.showinfo('Operacion','La operacion se guardo correctamente')
+        try:
+          self.hiloG.join()
+        except:
+          pass
       except:
         messagebox.showerror('Error','Hubo un error, vuelve a intentarlo.')
+        self.desaIngre(False)
+        try:
+          self.hiloG.join()
+        except:
+          pass
     elif self.confirmarVista==False:
       messagebox.showwarning('Vista previa','No has realizado la vista previa.')
+      self.desaIngre(False)
+      try:
+        self.hiloG.join()
+      except:
+        pass
+  
+  def desaIngre(self,confi):
+    if confi==True:
+      #desactivar guardar
+      self.botonGuardarOpe.config(state='disabled',text='Guardando...',fg='white',bg='black')
+      #desactivar vista previa
+      self.botonGuardarOpeV.config(state='disabled')
+      #desactivar limpiar
+      self.botonLimpiarOpe.config(state='disabled')
+
+    else:
+      #activar guardar
+      self.botonGuardarOpe.config(state='normal',text='Guardar',bg='#92e27a',fg='black')
+      #activar vista previa
+      self.botonGuardarOpeV.config(state='normal')
+      #activar limpiar
+      self.botonLimpiarOpe.config(state='normal')
 
   def verVistaP(self):
     activo=self.activoSelect.get().lower()
@@ -684,6 +746,61 @@ ID: {id}'''
       self.fechaE.delete(0,END)
       hoy=time.localtime()
       self.fechaE.insert(0,f'{hoy.tm_year}-{hoy.tm_mon}-{hoy.tm_mday}')
+
+  def actiDesaTodo(self,confi):
+    if confi == True:
+      self.botonSiburCSV.config(state='normal')
+      self.botonGuardarOpeV.config(state='normal')
+      self.botonGuardarOpe.config(state='normal')
+      self.botonLimpiarOpe.config(state='normal')
+      self.botonBuscar.config(state='normal')
+      self.modificarI.config(state='normal')
+      self.botonVeri.config(state='normal')
+    if confi == False:
+      self.botonSiburCSV.config(state='disabled')
+      self.botonGuardarOpeV.config(state='disabled')
+      self.botonGuardarOpe.config(state='disabled')
+      self.botonLimpiarOpe.config(state='disabled')
+      self.botonBuscar.config(state='disabled')
+      self.modificarI.config(state='disabled')
+      self.botonVeri.config(state='disabled')
+
+  def guardando(self):
+    self.actiDesaTodo(False)
+    self.botonSiburCSV.place(x=410,y=58)
+    self.botonSiburCSV.config(text='Guardando...')
+    for i in range(len(self.ope)-1,0,-1):
+      activo=str(self.ope[i]['activo']).lower()
+      valor=float(self.ope[i]['valor'])
+      sumarOperacion(valor,self.IDusuario)
+      valorPor=round(((valor/(float(obtenerValorActual(self.IDusuario))))*100),2)
+      fecha=self.ope[i]['fecha']
+      guardarValores([self.IDusuario,activo,valor,valorPor,fecha])
+    self.botonSiburCSV.config(text='Guardado')
+    self.actuActualGanPer()
+    self.actiDesaTodo(True)
+    self.botonSiburCSV.config(text='Subir CSV')
+    self.botonSiburCSV.place(x=430,y=58)
+    
+    try:
+      self.hiloGuardarCSV.join()
+    except:
+      pass
+
+  def ingresarCSV(self):
+    file=filedialog.askopenfile(initialdir='C',filetypes=(('Fichero csv','*csv'),('Todos los archivos','*.*')))
+    archivo=file
+    self.ope=leerArchivoCSV(archivo)
+    can=len(self.ope)
+    if self.ope=='No es de Libertex':
+      messagebox.showerror('Archivo','El archivo no es un archivo de operaciones de Libertex')
+    elif not self.ope==False:
+      alert=messagebox.askokcancel('Operaciones',f'Se han encontrado {can} operaciones, ¿Desea ingresarlas?')
+      if alert==True:
+        self.hiloGuardarCSV=Thread(target=self.guardando)
+        self.hiloGuardarCSV.start()
+    
+    #guardarValores() (self.IDusuario,activo,valor,valor Porcentaje,fecha)
 
 #----------------------funciones del apartado de calculadora----------------------#
   def porcentajeCal(self):
@@ -753,7 +870,6 @@ ID: {id}'''
     self.resMultiL.config(text='0')
 
 #--------------------funciones del apartado de ganancias/perdidas--------------------#
-  
   def ganPerValores(self):
     #actualizar valor actual
     actualizarValorActual(self.IDusuario)
@@ -790,8 +906,7 @@ ID: {id}'''
       self.valorSemActuL.config(text=f'{round(valorSemana,2)} USD / {round(porSemana,2)}%',fg='#ff7676')
 
 #--------------------funciones del apartado de buscar operaciones--------------------#
-
-  def seleccionBus(self,event):
+  def limpiarBuscarOpe(self):
     if self.activoSelectBus.get()=='ID':
       self.limpiarBus('ID')
       self.limpiarOpcionesActuBor()
@@ -837,6 +952,9 @@ ID: {id}'''
     self.sumaOpeL.place_forget() 
     self.mostrarNoOper.place_forget()
 
+  def seleccionBus(self,event):
+    self.limpiarBuscarOpe()
+    
   def limpiarBus(self,seleccion):
     if seleccion=='ID':
       #cosas DIA
@@ -933,8 +1051,13 @@ ID: {id}'''
       #cosas activo
       self.selectActivoOp.place_forget()
       self.activoLBusActi.place_forget()
-      
+  
   def buscar(self):
+    self.hiloB=Thread(target=self.buscarEspera)
+    self.hiloB.start()
+
+  def buscarEspera(self):
+    self.botonBuscar.config(state='disabled')
     #limpio la lista
     self.resBus.delete(0,END)
     self.logoLabel.place(x=660,y=430)
@@ -965,7 +1088,6 @@ ID: {id}'''
                 self.sumaOpeL.place_forget() 
                 self.mostrarNoOper.place_forget()
               else:
-                #self.resBus.insert(0,'ID: 15 | Activo: BTC | Valor: 3 USD | Fecha: 2022/12/26')
                 #hago el mensaje a mostrar
                 resultado=f'ID: {datosOpe[0]} - Activo: {str(saberActivoID(datosOpe[1])).upper()}'\
                 +f' - Valor: {datosOpe[2]} USD - Fecha: {datosOpe[4]}'
@@ -1129,6 +1251,24 @@ ID: {id}'''
         #validar fecha escrita
           try:
             datetime.strptime(diaPuesto, '%Y-%m')
+            #######
+            anio=''
+            mes=''
+            confi='0'
+            for i in diaPuesto:
+              if confi=='0':
+                if i=='-':
+                  confi='1'
+                  continue
+                anio+=i
+              elif confi=='1':
+                mes+=i
+            if int(mes)<10:
+              diaPuesto=anio+'-0'+mes
+            elif int(mes)>10:
+              diaPuesto=anio+'-'+mes
+            print(diaPuesto)
+            #######
             self.operaciones=[]
             if self.activoSelectMes.get()=='': #activo que selecciona la persona que es opcional
               if self.valorCheckNeg.get()==1 and self.valorCheckPos.get()==0:
@@ -1174,7 +1314,8 @@ ID: {id}'''
           except Exception as e:
             a=str(e)
             if 'unconverted' in a:
-              messagebox.showwarning('Ingreso dia','La fecha no existe')
+              messagebox.showwarning('Ingreso dia','''La fecha no existe o es incorrecta
+(no se puede agregar el dia)''')
               self.sumaOpeL.place_forget() 
               self.mostrarNoOper.place_forget()
             elif 'time data' in a:
@@ -1240,9 +1381,13 @@ ID: {id}'''
         else:
           #muestro la suma
           self.sumaOpeMos()
-
+    self.botonBuscar.config(state='normal')
     self.actuOpeB.place_forget()
     self.borrarOpeB.place_forget()
+    try:
+      self.hiloB.join()
+    except:
+      pass
   
   def opeSeleccionado(self,event):
     def esE(n):
@@ -1335,12 +1480,13 @@ ID: {id}'''
           activoA=self.activoMessa
           valorA=self.valorMessa
           fechaA=self.fechaMessa
-          
+
           #Valor ingresados por el usuario
           activo=self.activoSelectActu.get()
           valor=self.striValor.get()
           fecha=self.striFecha.get()
-          confi=messagebox.askokcancel('Actualizacion',f'''¿Confirma la actualizacion de la operación?
+          confi=messagebox.askokcancel('Actualizacion',\
+f'''¿Confirma la actualizacion de la operación?
 De:
 Activo: {activoA} - Valor: {valorA} USD - Fecha: {fechaA}
 A:
@@ -1348,14 +1494,14 @@ Activo: {activo} - Valor: {valor} USD - Fecha: {fecha}''')
           if confi==True:
             try:
               actualizarOperacion(self.idSelect,activo,valor,fecha)
+              self.actuActualGanPer()
               messagebox.showinfo('Actualizacion','Se actualizó correctamente la operacion.')
-              self.buscar()
-              self.ganPerValores()
+              self.limpiarBuscarOpe()
             except Exception as e:
               print(e)
           else:
             messagebox.showinfo('Actualizacion','Actualizacion cancelada.')
-            self.buscar()
+            self.limpiarBuscarOpe()
 
 
         except:
@@ -1385,14 +1531,14 @@ Activo: {activo} - Valor: {valor} USD - Fecha: {fecha}''')
     self.cancelarOpeBor.place(x=790,y=500)
   
   def borrarOpeConfi(self):
-    
+
     try:
       borrarOperacion(self.idSelect)
       messagebox.showinfo('Borrar operacion',f'La operacion con el ID: {self.idSelect} se borro correctamente.')
+      self.actuActualGanPer()
     except Exception as e:
       print(e)
-    self.ganPerValores()
-    self.buscar()
+    self.limpiarBuscarOpe()
 
   def cancelarConfir(self):
       self.limpiarOpcionesActuBor()
@@ -1442,5 +1588,4 @@ Activo: {activo} - Valor: {valor} USD - Fecha: {fecha}''')
         self.mostrarNoOper.place(x=840,y=370)
         self.mostrarNoOper.config(text=f'N° de operaciones: {cantidad}')
 
-
-#VentanaPrincipal(1)
+VentanaPrincipal(1)

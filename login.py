@@ -1,4 +1,3 @@
-\
 from tkinter import *
 import os
 from BD.conexionBD import *

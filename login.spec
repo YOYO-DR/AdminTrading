@@ -5,10 +5,10 @@ block_cipher = None
 
 
 a = Analysis(
-    ['F:/programacion/Proyectos/AdminTrading/Tkinter Python/login.py'],
+    ['F:/programacion/Proyectos/AdminTrading/Online/Tkinter Python/login.py'],
     pathex=[],
     binaries=[],
-    datas=[('F:/programacion/Proyectos/AdminTrading/Tkinter Python/media', 'media/')],
+    datas=[('F:/programacion/Proyectos/AdminTrading/Online/Tkinter Python/media', 'media/')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -41,5 +41,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['F:\\programacion\\Proyectos\\AdminTrading\\Tkinter Python\\media\\img\\icono.ico'],
+    icon=['F:\\programacion\\Proyectos\\AdminTrading\\Online\\Tkinter Python\\media\\img\\icono.ico'],
 )
