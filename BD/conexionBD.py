@@ -3,7 +3,7 @@ import time
 from datetime import datetime
 from calendar import monthrange
 
-""" def conexion():
+def conexion():
   con = mysql.connector.connect(
   host='20.168.252.60',#'192.168.110.47',
   user='yoyo',#'user',
@@ -13,9 +13,9 @@ from calendar import monthrange
   auth_plugin='mysql_native_password')
   cursor = con.cursor()
   cursor.close()
-  return con """
+  return con
 
-def conexion():
+""" def conexion():
   con = mysql.connector.connect(
   host='192.168.110.47',
   user='user',
@@ -25,7 +25,7 @@ def conexion():
   auth_plugin='mysql_native_password')
   cursor = con.cursor()
   cursor.close()
-  return con
+  return con """
 
 def buscarUsuario(nom):
   nom=nom.lower().strip()
@@ -84,8 +84,9 @@ def obtenActivos():
   activos=['']
   for i in cursor:
     activos.append(i[1].upper())
+  activosOrden=sorted(activos)
   con.close()
-  return activos
+  return activosOrden
 
 def siguienteID():
   con=conexion()
@@ -380,6 +381,22 @@ def borrarOperacion(id):
   cursor=con.cursor()
   cursor.execute(f'delete from operaciones where id={id}')
   con.commit()
+  con.close()
+
+def buscarActivoConfi(activo):
+  #Saber si el esta registrado
+  con=conexion()
+  cursor=con.cursor()
+
+  activo=activo.lower()
+
+  cursor.execute(f'select * from activo where nombre_activo="{activo}"')
+  a=''
+  for i in cursor:
+    a=i
+  if a == '':
+    cursor.execute(f'insert into activo (nombre_activo) values ("{activo}")')
+    con.commit()
   con.close()
 
  # tabla operaciones:

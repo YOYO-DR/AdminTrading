@@ -99,6 +99,7 @@ class VentanaPrincipal:
     self.selectA=ttk.Combobox(self.root,state='readonly',width=10,\
       font=('Leelawadee UI Semilight',10),textvariable=self.activoSelect,values=self.activoOpciones)
     self.selectA.place(x=20,y=110)
+    
 
     #label Valor usd
     self.valorUsdL=Label(self.root,text='Valor USD',bg='grey90',font=('Leelawadee UI Semilight',12))
@@ -257,9 +258,9 @@ class VentanaPrincipal:
 
     #combobox de tipo moneda
     self.activoSelectCal=StringVar()
-    self.activoOpciones=['CRIPTO','FOREX']
+    self.activoOpcionesC=['CRIPTO','FOREX']
     self.selectA=ttk.Combobox(self.root,state='readonly',width=10,\
-      font=('Leelawadee UI Semilight',10),textvariable=self.activoSelectCal,values=self.activoOpciones)
+      font=('Leelawadee UI Semilight',10),textvariable=self.activoSelectCal,values=self.activoOpcionesC)
     self.selectA.place(x=370,y=315)
 
     #------------------------------------------------------------------------------------#
@@ -397,7 +398,8 @@ class VentanaPrincipal:
     #label activo seleccion
     self.activoLBus=Label(self.root,text=f'Activo',bg='grey90',\
       font=('Leelawadee UI Semilight',12))
-    
+    self.activoOpciones=obtenActivos()
+
     #combobox de activo
     self.activoSelectDia=StringVar()
     self.activoOpcionesDia=obtenActivos()
@@ -571,8 +573,7 @@ class VentanaPrincipal:
     #label de N° de operaciones buscadas
     self.mostrarNoOper=Label(self.root,text='N° de operaciones: 20',bg='grey90',\
       font=('Leelawadee UI Semilight',12))
-    
-    
+
     self.root.mainloop()
 
 #-----------------------funciones del apartado de la barra-----------------------#
@@ -653,16 +654,20 @@ class VentanaPrincipal:
       try:
         sumarOperacion(round((float(self.valorUsdS.get())),2),self.IDusuario)
         guardarValores(self.valoresGuardar)
+        buscarActivoConfi(self.valoresGuardar[1])
         self.limpiarOpe()
         self.actuActualGanPer()
-        
         self.desaIngre(False)
+
+        #actualizar los activos despues de guardar
+        self.actuComboboxActivos()
+
         messagebox.showinfo('Operacion','La operacion se guardo correctamente')
         try:
           self.hiloG.join()
         except:
           pass
-      except:
+      except Exception as e:
         messagebox.showerror('Error','Hubo un error, vuelve a intentarlo.')
         self.desaIngre(False)
         try:
@@ -727,6 +732,7 @@ ID: {id}'''
       self.vistaPrevia.insert('1.0',insertar)
       self.vistaPrevia.config(state=DISABLED)
       self.valoresGuardar=[self.IDusuario,activo,valor,valorPor,fecha]
+      print(self.valoresGuardar)
       
   def limpiarOpe(self):
     self.valoresGuardar=[self.IDusuario]
@@ -771,6 +777,8 @@ ID: {id}'''
     self.botonSiburCSV.config(text='Guardando...')
     for i in range(len(self.ope)-1,0,-1):
       activo=str(self.ope[i]['activo']).lower()
+      #verificar si el activo esta y si no esta agregarlo a la base de datos
+      buscarActivoConfi(activo)
       valor=float(self.ope[i]['valor'])
       sumarOperacion(valor,self.IDusuario)
       valorPor=round(((valor/(float(obtenerValorActual(self.IDusuario))))*100),2)
@@ -778,6 +786,7 @@ ID: {id}'''
       guardarValores([self.IDusuario,activo,valor,valorPor,fecha])
     self.botonSiburCSV.config(text='Guardado')
     self.actuActualGanPer()
+    self.actuComboboxActivos()
     self.actiDesaTodo(True)
     self.botonSiburCSV.config(text='Subir CSV')
     self.botonSiburCSV.place(x=430,y=58)
@@ -786,6 +795,37 @@ ID: {id}'''
       self.hiloGuardarCSV.join()
     except:
       pass
+  
+  def actuComboboxActivos(self):
+    #para actualizar un combobox toca como "recrearlo" para que se aplique los valores dinamicamente
+    #actualizar los activos despues de guardar 
+    #ingresar operaciones
+    self.activoSelect=StringVar()
+    self.activoOpciones=obtenActivos()
+    self.selectA=ttk.Combobox(self.root,state='readonly',width=10,\
+      font=('Leelawadee UI Semilight',10),textvariable=self.activoSelect,values=self.activoOpciones)
+    self.selectA.place(x=20,y=110)
+
+    #buscar operaciones - dia
+    self.activoSelectDia=StringVar()
+    self.activoOpcionesDia=obtenActivos()
+    self.selectActivoDia=ttk.Combobox(self.root,state='readonly',width=10,\
+      font=('Leelawadee UI Semilight',10),textvariable=self.activoSelectDia,\
+        values=self.activoOpcionesDia)
+    
+    #buscar operaciones - mes
+    self.activoSelectMes=StringVar()
+    self.activoOpcionesMes=obtenActivos()
+    self.selectActivoMes=ttk.Combobox(self.root,state='readonly',width=10,\
+      font=('Leelawadee UI Semilight',10),textvariable=self.activoSelectMes,\
+        values=self.activoOpcionesMes)
+    
+    #buscar operaciones - activo
+    self.activoSelectOp=StringVar()
+    self.activoOpcionesOp=obtenActivos()
+    self.selectActivoOp=ttk.Combobox(self.root,state='readonly',width=10,\
+      font=('Leelawadee UI Semilight',10),textvariable=self.activoSelectOp,\
+        values=self.activoOpcionesOp)
 
   def ingresarCSV(self):
     file=filedialog.askopenfile(initialdir='C',filetypes=(('Fichero csv','*csv'),('Todos los archivos','*.*')))
@@ -799,8 +839,6 @@ ID: {id}'''
       if alert==True:
         self.hiloGuardarCSV=Thread(target=self.guardando)
         self.hiloGuardarCSV.start()
-    
-    #guardarValores() (self.IDusuario,activo,valor,valor Porcentaje,fecha)
 
 #----------------------funciones del apartado de calculadora----------------------#
   def porcentajeCal(self):
@@ -1267,7 +1305,6 @@ ID: {id}'''
               diaPuesto=anio+'-0'+mes
             elif int(mes)>10:
               diaPuesto=anio+'-'+mes
-            print(diaPuesto)
             #######
             self.operaciones=[]
             if self.activoSelectMes.get()=='': #activo que selecciona la persona que es opcional
@@ -1588,4 +1625,4 @@ Activo: {activo} - Valor: {valor} USD - Fecha: {fecha}''')
         self.mostrarNoOper.place(x=840,y=370)
         self.mostrarNoOper.config(text=f'N° de operaciones: {cantidad}')
 
-VentanaPrincipal(1)
+#VentanaPrincipal(1)

@@ -9,3 +9,5 @@ pyinstaller --noconfirm --onefile --windowed
 --icon "F:/programacion/Proyectos/AdminTrading/Online/Tkinter Python/media/img/icono.ico" 
 --add-data "F:/programacion/Proyectos/AdminTrading/Online/Tkinter Python/media;media/" 
 "F:/programacion/Proyectos/AdminTrading/Online/Tkinter Python/login.py"
+
+pyinstaller --noconfirm --onefile --windowed --icon "F:/programacion/Proyectos/AdminTrading/Online/Tkinter Python/media/img/icono.ico" --add-data "F:/programacion/Proyectos/AdminTrading/Online/Tkinter Python/media;media/" "F:/programacion/Proyectos/AdminTrading/Online/Tkinter Python/login.py"
