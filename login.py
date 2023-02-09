@@ -46,8 +46,6 @@ class VentanaLogin:
     self.contraseña=Entry(self.login,width=18,bg='#8c8c8c',\
     font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorContraseña,show='*').place(x=130,y=316)
 
-    
-
     #botones aceptar y cancelar
     self.botonAceptar=Button(self.login,bg='#8c8c8c',text='Aceptar',command=self.FAceptar)
     self.botonAceptar.place(x=130,y=355)

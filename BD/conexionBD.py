@@ -13,19 +13,72 @@ def conexion():
   auth_plugin='mysql_native_password')
   cursor = con.cursor()
   cursor.close()
-  return con
+  return con 
 
 """ def conexion():
   con = mysql.connector.connect(
-  host='192.168.110.47',
-  user='user',
+  host='127.0.0.1',
+  user='root',
   password='root',
   port='3306',
-  database='admintrading',
+  database='admintrading_local',
   auth_plugin='mysql_native_password')
   cursor = con.cursor()
   cursor.close()
   return con """
+
+def actualizarOperacion(idOpe,activo,valor,fecha):
+  con=conexion()
+  cursor=con.cursor()
+  cursor.execute(f'select * from activo where nombre_activo="{activo}"')
+  for i in cursor:
+    idActivo=i[0]
+
+  cursor.execute(f'update operaciones set id_activo={idActivo},valor={valor},fecha="{fecha}" where id={idOpe}')
+  con.commit()
+  con.close()
+
+def actualizarValorActual(idUsario):
+  con=conexion()
+  cursor=con.cursor()
+  valor=sumaTodasOperaciones(idUsario)+obtenerValorInicio(idUsario)
+  cursor.execute(f"update usuario set totalActual={valor} where id={idUsario};")
+  con.commit()
+  con.close()
+
+def actualizarInicio(idUsuario,valor):
+  con=conexion()
+  cursor=con.cursor()
+  cursor.execute(f"update usuario set inicioCuenta={valor} where id={idUsuario};")
+  con.commit()
+  con.close()
+
+def borrarOperacion(id):
+  con=conexion()
+  cursor=con.cursor()
+  cursor.execute(f'delete from operaciones where id={id}')
+  con.commit()
+  con.close()
+
+def buscarActivoConfi(activo):
+  #Saber si el esta registrado
+  con=conexion()
+  cursor=con.cursor()
+
+  activo=activo.lower()
+
+  cursor.execute(f'select * from activo where nombre_activo="{activo}"')
+  a=''
+  for i in cursor:
+    a=i
+  if a == '':
+    cursor.execute(f'insert into activo (nombre_activo) values ("{activo}")')
+    con.commit()
+  cursor.execute(f"select * from activo where nombre_activo='{activo}'")
+  for i in cursor:
+    id_activo=i[0]
+  con.close()
+  return id_activo
 
 def buscarUsuario(nom):
   nom=nom.lower().strip()
@@ -41,222 +94,6 @@ def buscarUsuario(nom):
   else:
     cur.close()
     return False
-
-def verificarUsuario(usuario,contraseña):
-  con=conexion()
-  cur=con.cursor()
-  cur.execute(f"select * from usuario where usuario='{usuario}';")
-  user=()
-  for i in cur:
-    user=i
-  cur.execute(f"select * from usuario where contraseña='{contraseña}';")
-  contra=()
-  for i in cur:
-    contra=i
-
-  if len(user)!=0 and len(contra)!=0:
-    cur.close()
-    return True
-  else:
-    cur.close()
-    return False
-
-def obtenerIdUsuario(usuario):
-  con=conexion()
-  cursor=con.cursor()
-  cursor.execute(f"select * from usuario where usuario='{usuario}'")
-  for i in cursor:
-    idUsuario=i[0]
-  con.close()
-  return idUsuario
-
-def registrar(usuario, contraseña,valorInicial):
-  con=conexion()
-  cursor=con.cursor()
-  cursor.execute(f"insert into usuario(usuario,contraseña,inicioCuenta,totalActual) values('{usuario}','{contraseña}',{valorInicial},{valorInicial});")
-  con.commit()
-  cursor.close()
-
-def obtenActivos():
-  con=conexion()
-  cursor=con.cursor()
-  cursor.execute(f"select * from activo")
-  activos=['']
-  for i in cursor:
-    activos.append(i[1].upper())
-  activosOrden=sorted(activos)
-  con.close()
-  return activosOrden
-
-def siguienteID():
-  con=conexion()
-  cursor=con.cursor()
-  idUltimo=0
-  cursor.execute('select * from operaciones;')
-  for i in cursor:
-    idUltimo=i
-  if idUltimo!=0:
-    cursor.execute('select max(id) from operaciones;')
-    for i in cursor:
-      idUltimo=i[0]
-    idUltimo+=1
-  else:
-    idUltimo=1
-  con.close()
-  return idUltimo
-
-def guardarValores(datos): 
-  con=conexion()
-  cursor=con.cursor()
-  cursor.execute(f"select * from activo where nombre_activo='{datos[1]}'")
-  for i in cursor:
-    id_activo=i[0]
-  cursor.execute(f"insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha) values ({datos[0]},{id_activo}, {datos[2]}, {datos[3]}, '{datos[4]}');")
-  con.commit()
-  con.close()
-
-def obtenerValorInicio(idUsuario):
-  con=conexion()
-  cursor=con.cursor()
-  valorInicio=0
-  cursor.execute(f"select * from usuario where id={idUsuario};")
-  for i in cursor:
-    valorInicio=i[3]
-  con.close()
-  return valorInicio
-
-def sumarOperacion(operacion,idUsuario):
-  con=conexion()
-  cursor=con.cursor()
-  valorActual=0
-  cursor.execute(f"select * from usuario where id={idUsuario};")
-  for i in cursor:
-    valorActual=float(i[4])
-  valorActual+=operacion
-  cursor.execute(f"update usuario set totalActual={valorActual} where id={idUsuario};")
-  con.commit()
-  con.close()
-
-def obtenerValorActual(idUsuario):
-  con=conexion()
-  cursor=con.cursor()
-  cursor.execute(f"select * from usuario where id={idUsuario}")
-  valorActual=0
-  for i in cursor:
-    valorActual=i[4]
-  con.close()
-  return valorActual
-
-def actualizarInicio(idUsuario,valor):
-  con=conexion()
-  cursor=con.cursor()
-  cursor.execute(f"update usuario set inicioCuenta={valor} where id={idUsuario};")
-  con.commit()
-  con.close()
-  
-def sumaTodasOperaciones(idUsuario):
-  con=conexion()
-  cursor=con.cursor()
-  suma=0
-  cursor.execute(f"select * from operaciones where id_usuario={idUsuario}")
-  for i in cursor:
-    suma+=i[3]
-  con.close()
-  return suma
-
-def actualizarValorActual(idUsario):
-  con=conexion()
-  cursor=con.cursor()
-  valor=sumaTodasOperaciones(idUsario)+obtenerValorInicio(idUsario)
-  cursor.execute(f"update usuario set totalActual={valor} where id={idUsario};")
-  con.commit()
-  con.close()
-
-def sumaOperMes(id):
-  con=conexion()
-  cursor=con.cursor()
-  fecha=time.localtime()
-  if fecha.tm_mon<10:
-    mes=f'{fecha.tm_year}-0{fecha.tm_mon}' 
-  else:
-    mes=f'{fecha.tm_year}-{fecha.tm_mon}'
-  cursor.execute(f"select o.id, o.valor, a.nombre_activo activo, o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id} and o.fecha like '{mes}%';")
-  suma=0
-  for i in cursor:
-    suma+=float(i[1])
-  ValorIniMes=float(obtenerValorActual(id))-suma
-  por=(suma/ValorIniMes)*100
-  con.close()
-  return [suma,por]
-
-def sumaOperSemana(id):
-  diaActualSem=int(datetime.today().weekday())+1
-  con=conexion()
-  cursor=con.cursor()
-  localT=time.localtime()
-  
-  #inicioS=int(localT.tm_mday)-diaActualSem
-
-  if diaActualSem>int(localT.tm_mday) and int(localT.tm_mon)==1:
-
-    inicioS=int(monthrange(int(localT.tm_year)-1,12))-diaActualSem
-    anioMes=f'{int(localT.tm_year)-1}-12'
-
-  elif diaActualSem>int(localT.tm_mday) and int(localT.tm_mon)<10:
-
-    inicioS=int(monthrange(int(localT.tm_year),int(localT.tm_mon)-1))-diaActualSem
-    anioMes=f'{int(localT.tm_year)}-0{int(localT.tm_mon)-1}'
-
-  elif diaActualSem>int(localT.tm_mday) and int(localT.tm_mon)>10:
-    inicioS=int(monthrange(int(localT.tm_year),int(localT.tm_mon)-1))-diaActualSem
-    anioMes=f'{int(localT.tm_year)}-{int(localT.tm_mon)-1}'
-  else:
-    inicioS=int(localT.tm_mday)-diaActualSem
-    if int(localT.tm_mon)<10:
-      anioMes=f'{localT.tm_year}-0{int(localT.tm_mon)}'
-    else:
-      anioMes=f'{localT.tm_year}-{int(localT.tm_mon)}'
-    
-  cursor.execute(f"select o.id, o.valor,a.nombre_activo activo,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id} and o.fecha > '{anioMes}-{inicioS}';")
-  suma=0
-  for i in cursor:
-    suma+=float(i[1])
-  con.close()
-
-  ValorIniSemana=float(obtenerValorActual(id))-suma
-  por=(suma/ValorIniSemana)*100
-  return [suma,por]
-
-def buscarOperacionID(idUsuario,id=0,pos=2):
-  con=conexion()
-  cursor=con.cursor()
-  if pos==False:
-    cursor.execute(f"select * from operaciones where id_usuario={idUsuario} and id={id} and valor<0;")
-  elif pos==True:
-    cursor.execute(f"select * from operaciones where id_usuario={idUsuario} and id={id} and valor>0;")
-  elif pos==2:
-    cursor.execute(f"select * from operaciones where id_usuario={idUsuario} and id={id};")
-  ope=[]
-  for i in cursor:
-    
-    #id operacion, id activo,valor,valor en porcentaje,fecha
-    ope=[i[0],i[2],i[3],i[4],i[5]]
-  if len(ope)==0:
-    con.close()
-    return False
-  else:
-    con.close()
-    return ope
-
-def saberActivoID(id):
-  con=conexion()
-  cursor=con.cursor()
-  cursor.execute(f'select * from activo where id={id}')
-  valor=0
-  for i in cursor:
-    valor=i[1]
-  con.close()
-  return valor
 
 def buscarOpeDia(id,dia,activo='',pos=2):
   con=conexion()
@@ -352,6 +189,114 @@ def buscarOpeTodo(id,pos=2):
   con.close()
   return ope
 
+def buscarOperacionID(idUsuario,id=0,pos=2):
+  con=conexion()
+  cursor=con.cursor()
+  if pos==False:
+    cursor.execute(f"select * from operaciones where id_usuario={idUsuario} and id={id} and valor<0;")
+  elif pos==True:
+    cursor.execute(f"select * from operaciones where id_usuario={idUsuario} and id={id} and valor>0;")
+  elif pos==2:
+    cursor.execute(f"select * from operaciones where id_usuario={idUsuario} and id={id};")
+  ope=[]
+  for i in cursor:
+    
+    #id operacion, id activo,valor,valor en porcentaje,fecha
+    ope=[i[0],i[2],i[3],i[4],i[5]]
+  if len(ope)==0:
+    con.close()
+    return False
+  else:
+    con.close()
+    return ope
+
+def buscarOperacionesID(idUsuario,id1,id2,pos=2):
+  con=conexion()
+  cursor=con.cursor()
+  if pos==False:
+    cursor.execute(f"select o.id,o.id_usuario,a.nombre_activo,o.valor,o.valorPorcentaje,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={idUsuario} and o.id>={id1} and o.id<={id2} and o.valor<0;")
+  elif pos==True:
+    cursor.execute(f"select o.id,o.id_usuario,a.nombre_activo,o.valor,o.valorPorcentaje,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={idUsuario} and o.id>={id1} and o.id<={id2} and o.valor>0;")
+  elif pos==2:
+    cursor.execute(f"select o.id,o.id_usuario,a.nombre_activo,o.valor,o.valorPorcentaje,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={idUsuario} and o.id>={id1} and o.id<={id2};")
+  ope=[]
+  for i in cursor:
+    #id,id usuario, id activo,valor,valor en porcentaje,fecha
+    a=[i[0],i[2],i[3],i[4],i[5]]
+    if len(a)==0:
+      continue
+    else:
+      ope.append(a)
+  con.close()
+  return ope
+
+def guardarValores(datos): 
+  con=conexion()
+  cursor=con.cursor()
+  sql="insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha) values (%s,%s,%s,%s,%s)"
+  valores=[]
+  valores.append(datos)
+  cursor.executemany(sql,tuple(valores))
+  con.commit()
+  con.close()
+
+def obtenerIdUsuario(usuario):
+  con=conexion()
+  cursor=con.cursor()
+  cursor.execute(f"select * from usuario where usuario='{usuario}'")
+  for i in cursor:
+    idUsuario=i[0]
+  con.close()
+  return idUsuario
+
+def obtenerValorInicio(idUsuario):
+  con=conexion()
+  cursor=con.cursor()
+  valorInicio=0
+  cursor.execute(f"select * from usuario where id={idUsuario};")
+  for i in cursor:
+    valorInicio=i[3]
+  con.close()
+  return valorInicio
+
+def obtenerValorActual(idUsuario):
+  con=conexion()
+  cursor=con.cursor()
+  cursor.execute(f"select * from usuario where id={idUsuario}")
+  valorActual=0
+  for i in cursor:
+    valorActual=i[4]
+  con.close()
+  return valorActual
+
+def obtenActivos():
+  con=conexion()
+  cursor=con.cursor()
+  cursor.execute(f"select * from activo")
+  activos=['']
+  for i in cursor:
+    activos.append(i[1].upper())
+  activosOrden=sorted(activos)
+  con.close()
+  return activosOrden
+
+def registrar(usuario, contraseña,valorInicial):
+  con=conexion()
+  cursor=con.cursor()
+  cursor.execute(f"insert into usuario(usuario,contraseña,inicioCuenta,totalActual) values('{usuario}','{contraseña}',{valorInicial},{valorInicial});")
+  con.commit()
+  cursor.close()
+
+def saberActivoID(id):
+  con=conexion()
+  cursor=con.cursor()
+  cursor.execute(f'select * from activo where id={id}')
+  valor=0
+  for i in cursor:
+    valor=i[1]
+  con.close()
+  return valor
+
 def saberActivoValorFecha(idOpe):
   con=conexion()
   cursor=con.cursor()
@@ -365,39 +310,118 @@ def saberActivoValorFecha(idOpe):
   con.close()
   return ope
 
-def actualizarOperacion(idOpe,activo,valor,fecha):
+def siguienteID():
   con=conexion()
   cursor=con.cursor()
-  cursor.execute(f'select * from activo where nombre_activo="{activo}"')
+  idUltimo=0
+  cursor.execute('select * from operaciones;')
   for i in cursor:
-    idActivo=i[0]
+    idUltimo=i
+  if idUltimo!=0:
+    cursor.execute('select max(id) from operaciones;')
+    for i in cursor:
+      idUltimo=i[0]
+    idUltimo+=1
+  else:
+    idUltimo=1
+  con.close()
+  return idUltimo
 
-  cursor.execute(f'update operaciones set id_activo={idActivo},valor={valor},fecha="{fecha}" where id={idOpe}')
+def sumarOperacion(operacion,idUsuario):
+  con=conexion()
+  cursor=con.cursor()
+  valorActual=0
+  cursor.execute(f"select * from usuario where id={idUsuario};")
+  for i in cursor:
+    valorActual=float(i[4])
+  valorActual+=operacion
+  cursor.execute(f"update usuario set totalActual={valorActual} where id={idUsuario};")
   con.commit()
   con.close()
 
-def borrarOperacion(id):
+def sumaTodasOperaciones(idUsuario):
   con=conexion()
   cursor=con.cursor()
-  cursor.execute(f'delete from operaciones where id={id}')
-  con.commit()
-  con.close()
-
-def buscarActivoConfi(activo):
-  #Saber si el esta registrado
-  con=conexion()
-  cursor=con.cursor()
-
-  activo=activo.lower()
-
-  cursor.execute(f'select * from activo where nombre_activo="{activo}"')
-  a=''
+  suma=0
+  cursor.execute(f"select * from operaciones where id_usuario={idUsuario}")
   for i in cursor:
-    a=i
-  if a == '':
-    cursor.execute(f'insert into activo (nombre_activo) values ("{activo}")')
-    con.commit()
+    suma+=i[3]
   con.close()
+  return suma
+
+def sumaOperMes(id):
+  con=conexion()
+  cursor=con.cursor()
+  fecha=time.localtime()
+  if fecha.tm_mon<10:
+    mes=f'{fecha.tm_year}-0{fecha.tm_mon}' 
+  else:
+    mes=f'{fecha.tm_year}-{fecha.tm_mon}'
+  cursor.execute(f"select o.id, o.valor, a.nombre_activo activo, o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id} and o.fecha like '{mes}%';")
+  suma=0
+  for i in cursor:
+    suma+=float(i[1])
+  ValorIniMes=float(obtenerValorActual(id))-suma
+  por=(suma/ValorIniMes)*100
+  con.close()
+  return [suma,por]
+
+def sumaOperSemana(id):
+  diaActualSem=int(datetime.today().weekday())+1
+  con=conexion()
+  cursor=con.cursor()
+  localT=time.localtime()
+  
+  #inicioS=int(localT.tm_mday)-diaActualSem
+
+  if diaActualSem>int(localT.tm_mday) and int(localT.tm_mon)==1:
+
+    inicioS=int(monthrange(int(localT.tm_year)-1,12))-diaActualSem
+    anioMes=f'{int(localT.tm_year)-1}-12'
+
+  elif diaActualSem>int(localT.tm_mday) and int(localT.tm_mon)<10:
+    inicioS=int(monthrange(int(localT.tm_year),int(localT.tm_mon)-1)[1])-diaActualSem
+
+    anioMes=f'{int(localT.tm_year)}-0{int(localT.tm_mon)-1}'
+
+  elif diaActualSem>int(localT.tm_mday) and int(localT.tm_mon)>10:
+    inicioS=int(monthrange(int(localT.tm_year),int(localT.tm_mon)-1)[1])-diaActualSem
+    anioMes=f'{int(localT.tm_year)}-{int(localT.tm_mon)-1}'
+  else:
+    inicioS=int(localT.tm_mday)-diaActualSem
+    if int(localT.tm_mon)<10:
+      anioMes=f'{localT.tm_year}-0{int(localT.tm_mon)}'
+    else:
+      anioMes=f'{localT.tm_year}-{int(localT.tm_mon)}'
+    
+  cursor.execute(f"select o.id, o.valor,a.nombre_activo activo,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id} and o.fecha > '{anioMes}-{inicioS}';")
+  suma=0
+  for i in cursor:
+    suma+=float(i[1])
+  con.close()
+
+  ValorIniSemana=float(obtenerValorActual(id))-suma
+  por=(suma/ValorIniSemana)*100
+  return [suma,por]
+
+def verificarUsuario(usuario,contraseña):
+  con=conexion()
+  cur=con.cursor()
+  cur.execute(f"select * from usuario where usuario='{usuario}';")
+  user=()
+  for i in cur:
+    user=i
+  cur.execute(f"select * from usuario where contraseña='{contraseña}';")
+  contra=()
+  for i in cur:
+    contra=i
+
+  if len(user)!=0 and len(contra)!=0:
+    cur.close()
+    return True
+  else:
+    cur.close()
+    return False
 
  # tabla operaciones:
   #create table operaciones

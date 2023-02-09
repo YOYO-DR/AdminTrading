@@ -133,6 +133,7 @@ def leerArchivoCSV(file):
             'valor':valor
         }
           ope.append(operacion)
+          print(operacion)
         id=''
         activo=''
         fecha=''
@@ -140,3 +141,4 @@ def leerArchivoCSV(file):
         confi='0'
         continue
   return ope
+

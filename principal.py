@@ -11,9 +11,9 @@ from LeerarchivosCSV.leerCSV import *
 class VentanaPrincipal:
   def __init__(self,id):
     self.root=Tk()
-    #self.root.geometry('1050x600+100+50')
+    self.root.geometry('1050x600+100+50')
     self.root.geometry('1050x600+1500+50')
-    self.root.resizable(width=False,height=False)
+    #self.root.resizable(width=False,height=False)
     self.root.title('AdminTrading')
     self.IDusuario=id
     #-------------------------------------------------------------------------------#
@@ -173,6 +173,12 @@ class VentanaPrincipal:
     self.tituloIngresar=Label(self.root,text='Calculadora',bg='grey90',\
       font=('Leelawadee UI Semilight',14,'bold'))
     self.tituloIngresar.place(x=20,y=260)
+
+    #Label de 2% y 6%
+    self.valorPor=[float(obtenerValorActual(self.IDusuario))*2/100,float(obtenerValorActual(self.IDusuario))*6/100]
+    self.dosPor=Label(self.root,text=f'2%: {round(self.valorPor[0],2)} USD  --  6%: {round(self.valorPor[1],2)} USD',bg='grey90',\
+                      font=('Leelawadee UI Semilight',12,'bold'))
+    self.dosPor.place(x=190,y=260)
 
     #label de valor SL
     self.valorSL=Label(self.root,text='Valor SL',bg='grey90',font=('Leelawadee UI Semilight',12))
@@ -641,6 +647,11 @@ class VentanaPrincipal:
   def actuActualGanPer(self):
     self.MValorActual=obtenerValorActual(self.IDusuario)
     self.tituloB.config(text=f'Inicio: {self.valorInicioMostrar}   Actual: {self.MValorActual}')
+    #actualizar porcentajes de SL y TP
+    self.valorPor=[float(obtenerValorActual(self.IDusuario))*2/100,float(obtenerValorActual(self.IDusuario))*6/100]
+    self.dosPor=Label(self.root,text=f'2%: {round(self.valorPor[0],2)} USD  --  6%: {round(self.valorPor[1],2)} USD',bg='grey90',\
+                      font=('Leelawadee UI Semilight',12,'bold'))
+    self.dosPor.place(x=190,y=260)
     self.ganPerValores()
 
   def guardar(self):
@@ -649,27 +660,32 @@ class VentanaPrincipal:
 
   def guardarEspera(self):
     if self.confirmarVista==True:
-      sleep(0.15)
-      self.desaIngre(True)
-      try:
+        sleep(0.15)
+        self.desaIngre(True) #las movi al frente
+      #try:
         sumarOperacion(round((float(self.valorUsdS.get())),2),self.IDusuario)
+        id_activo=buscarActivoConfi(self.valoresGuardar[1])
+        self.valoresGuardar[1]=id_activo
         guardarValores(self.valoresGuardar)
-        buscarActivoConfi(self.valoresGuardar[1])
+
+        #actualizar los activos despues de guardar
+        self.actuComboboxActivos()
+        messagebox.showinfo('Operacion','La operacion se guardo correctamente')
+
         self.limpiarOpe()
         self.actuActualGanPer()
         self.desaIngre(False)
 
-        #actualizar los activos despues de guardar
-        self.actuComboboxActivos()
+        
 
-        messagebox.showinfo('Operacion','La operacion se guardo correctamente')
         try:
           self.hiloG.join()
         except:
           pass
-      except Exception as e:
-        messagebox.showerror('Error','Hubo un error, vuelve a intentarlo.')
-        self.desaIngre(False)
+      #except Exception as e:
+        #print(e)
+        #messagebox.showerror('Error','Hubo un error, vuelve a intentarlo.')
+        #self.desaIngre(False)
         try:
           self.hiloG.join()
         except:
@@ -732,7 +748,6 @@ ID: {id}'''
       self.vistaPrevia.insert('1.0',insertar)
       self.vistaPrevia.config(state=DISABLED)
       self.valoresGuardar=[self.IDusuario,activo,valor,valorPor,fecha]
-      print(self.valoresGuardar)
       
   def limpiarOpe(self):
     self.valoresGuardar=[self.IDusuario]
@@ -775,15 +790,18 @@ ID: {id}'''
     self.actiDesaTodo(False)
     self.botonSiburCSV.place(x=410,y=58)
     self.botonSiburCSV.config(text='Guardando...')
-    for i in range(len(self.ope)-1,0,-1):
-      activo=str(self.ope[i]['activo']).lower()
+    operaciones=[]
+    for i in range(len(self.ope),0,-1):
+      activo=str(self.ope[i-1]['activo']).lower()
       #verificar si el activo esta y si no esta agregarlo a la base de datos
-      buscarActivoConfi(activo)
-      valor=float(self.ope[i]['valor'])
+      idActivo=buscarActivoConfi(activo)
+      valor=float(self.ope[i-1]['valor'])
       sumarOperacion(valor,self.IDusuario)
       valorPor=round(((valor/(float(obtenerValorActual(self.IDusuario))))*100),2)
-      fecha=self.ope[i]['fecha']
-      guardarValores([self.IDusuario,activo,valor,valorPor,fecha])
+      fecha=self.ope[i-1]['fecha']
+      b=[self.IDusuario,idActivo,valor,valorPor,fecha]
+      operaciones.append(tuple(b))
+    guardarValores(operaciones)
     self.botonSiburCSV.config(text='Guardado')
     self.actuActualGanPer()
     self.actuComboboxActivos()
@@ -919,7 +937,7 @@ ID: {id}'''
     #%
     valorPor=(valorUSD/valorInicial)*100
     if valorUSD>0:
-      self.valorTotalActuL.config(text=f'{round(valorUSD,2)} USD / {round(valorPor,2)}%')
+      self.valorTotalActuL.config(text=f'{round(valorUSD,2)} USD / {round(valorPor,2)}%,',fg='#009929')
     elif valorUSD<0:
       self.valorTotalActuL.config(text=f'{round(valorUSD,2)} USD / {round(valorPor,2)}%',fg='#ff7676')
     
@@ -929,7 +947,7 @@ ID: {id}'''
     valorMes=sumaOperMes(self.IDusuario)[0]
     porMes=sumaOperMes(self.IDusuario)[1]
     if valorMes>0:
-      self.valorMesActuL.config(text=f'{round(valorMes,2)} USD / {round(porMes,2)}%')
+      self.valorMesActuL.config(text=f'{round(valorMes,2)} USD / {round(porMes,2)}%',fg='#009929')
     elif valorMes<0:
       self.valorMesActuL.config(text=f'{round(valorMes,2)} USD / {round(porMes,2)}%',fg='#ff7676')
 
@@ -939,7 +957,7 @@ ID: {id}'''
     valorSemana=sumaOperSemana(self.IDusuario)[0]
     porSemana=sumaOperSemana(self.IDusuario)[1]
     if valorSemana>0:
-      self.valorSemActuL.config(text=f'{round(valorSemana,2)} USD / {round(porSemana,2)}%')
+      self.valorSemActuL.config(text=f'{round(valorSemana,2)} USD / {round(porSemana,2)}%',fg='#009929')
     elif valorSemana<0:
       self.valorSemActuL.config(text=f'{round(valorSemana,2)} USD / {round(porSemana,2)}%',fg='#ff7676')
 
@@ -1168,13 +1186,12 @@ ID: {id}'''
                     pos=False
                   elif self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==1:
                     pos=True
-                  self.operaciones=[]
-                  for i in range(id2, id1-1,-1):
-                    a=buscarOperacionID(self.IDusuario,i,pos)
-                    self.operaciones.append(a)
-                    if a!=False:
-                      b=f'ID: {a[0]} - Activo: {str(saberActivoID(a[1])).upper()} - Valor: {a[2]} USD - Fecha: {a[4]}'
-                      self.resBus.insert(0,b)
+                  self.operaciones=buscarOperacionesID(self.IDusuario,id1,id2,pos)
+                  import time
+                  for i in range(id1-1,id2):
+                    a=self.operaciones[i]
+                    b=f'ID: {a[0]} - Activo: {str(a[1]).upper()} - Valor: {a[2]} USD - Fecha: {a[4]}'
+                    self.resBus.insert(0,b)
 
                   if self.resBus.get(0)=='':
                     self.resBus.insert(0,'No se encontraron resultados.')

@@ -3,7 +3,7 @@ from tkinter import filedialog
 from leerCSV import *
 import os
 from threading import Thread
-
+from leerCSV import *
 class root:
   def __init__(self):
     self.root = Tk()
@@ -19,7 +19,7 @@ class root:
   def abrirCSV(self):
     archivo=filedialog.askopenfile(initialdir='C',filetypes=(('Fichero de CSV','*.csv'),('Fichero de Excel','*xlsx'),('Todos','*.*')))
     file=archivo
-    ope=leer(file)
+    ope=leerArchivoCSV(file)
     for i in ope:
       print(i)
 
