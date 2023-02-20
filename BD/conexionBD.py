@@ -64,9 +64,7 @@ def buscarActivoConfi(activo):
   #Saber si el esta registrado
   con=conexion()
   cursor=con.cursor()
-
   activo=activo.lower()
-
   cursor.execute(f'select * from activo where nombre_activo="{activo}"')
   a=''
   for i in cursor:
@@ -230,13 +228,15 @@ def buscarOperacionesID(idUsuario,id1,id2,pos=2):
   con.close()
   return ope
 
-def guardarValores(datos): 
+def guardarValores(dato=1,datos=0): 
   con=conexion()
   cursor=con.cursor()
-  sql="insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha) values (%s,%s,%s,%s,%s)"
-  valores=[]
-  valores.append(datos)
-  cursor.executemany(sql,tuple(valores))
+  if dato==1:
+    sql="insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha) values (%s,%s,%s,%s,%s)"
+    cursor.executemany(sql,datos)
+  elif datos==0:
+    sql="insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha) values (%s,%s,%s,%s,%s)"
+    cursor.execute(sql,dato)
   con.commit()
   con.close()
 
@@ -268,6 +268,15 @@ def obtenerValorActual(idUsuario):
     valorActual=i[4]
   con.close()
   return valorActual
+
+def obtenerActivoYId():
+  con=conexion()
+  cursor=con.cursor()
+  cursor.execute(f"select * from activo")
+  activoID={}
+  for i in cursor:
+    activoID[i[1]]=i[0]
+  return activoID
 
 def obtenActivos():
   con=conexion()

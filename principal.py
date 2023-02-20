@@ -666,8 +666,8 @@ class VentanaPrincipal:
         sumarOperacion(round((float(self.valorUsdS.get())),2),self.IDusuario)
         id_activo=buscarActivoConfi(self.valoresGuardar[1])
         self.valoresGuardar[1]=id_activo
-        guardarValores(self.valoresGuardar)
-
+        guardarValores(dato=self.valoresGuardar)
+        print(self.valoresGuardar)
         #actualizar los activos despues de guardar
         self.actuComboboxActivos()
         messagebox.showinfo('Operacion','La operacion se guardo correctamente')
@@ -790,18 +790,29 @@ ID: {id}'''
     self.actiDesaTodo(False)
     self.botonSiburCSV.place(x=410,y=58)
     self.botonSiburCSV.config(text='Guardando...')
+
+    valorActual=obtenerValorActual(self.IDusuario)
+    activosActuales=obtenerActivoYId()
     operaciones=[]
+    con=0
+    sumaValores=0
     for i in range(len(self.ope),0,-1):
       activo=str(self.ope[i-1]['activo']).lower()
       #verificar si el activo esta y si no esta agregarlo a la base de datos
-      idActivo=buscarActivoConfi(activo)
+      if activo not in activosActuales:
+        idActivo=buscarActivoConfi(activo)
+      else:
+        idActivo=activosActuales[activo]
       valor=float(self.ope[i-1]['valor'])
-      sumarOperacion(valor,self.IDusuario)
-      valorPor=round(((valor/(float(obtenerValorActual(self.IDusuario))))*100),2)
+      sumaValores+=valor
+      valorPor=round(((valor/(float(valorActual)))*100),2)
       fecha=self.ope[i-1]['fecha']
       b=[self.IDusuario,idActivo,valor,valorPor,fecha]
       operaciones.append(tuple(b))
-    guardarValores(operaciones)
+      con+=1
+      print(f'{con}/{len(self.ope)}')
+    sumarOperacion(sumaValores,self.IDusuario)
+    guardarValores(datos=operaciones)
     self.botonSiburCSV.config(text='Guardado')
     self.actuActualGanPer()
     self.actuComboboxActivos()
@@ -1642,4 +1653,4 @@ Activo: {activo} - Valor: {valor} USD - Fecha: {fecha}''')
         self.mostrarNoOper.place(x=840,y=370)
         self.mostrarNoOper.config(text=f'N° de operaciones: {cantidad}')
 
-#VentanaPrincipal(1)
+VentanaPrincipal(1)
