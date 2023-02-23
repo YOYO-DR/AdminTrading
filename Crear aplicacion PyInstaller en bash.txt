@@ -1,13 +1,13 @@
 para versiones Beta en la carpeta V2-csv
 pyinstaller --noconfirm --onefile --windowed 
---icon "F:/programacion/Proyectos/AdminTrading/Online/Tkinter Python/V2-csv/media/img/icono.ico" 
---add-data "F:/programacion/Proyectos/AdminTrading/Online/Tkinter Python/V2-csv/media;media/" 
-"F:/programacion/Proyectos/AdminTrading/Online/Tkinter Python/V2-csv/login.py"
+--icon "D:/programacion/Proyectos/AdminTrading/Online/Tkinter Python/V2-csv/media/img/icono.ico" 
+--add-data "D:/programacion/Proyectos/AdminTrading/Online/Tkinter Python/V2-csv/media;media/" 
+"D:/programacion/Proyectos/AdminTrading/Online/Tkinter Python/V2-csv/login.py"
 
 principal:
 pyinstaller --noconfirm --onefile --windowed 
---icon "F:/programacion/Proyectos/AdminTrading/Online/Tkinter Python/media/img/icono.ico" 
---add-data "F:/programacion/Proyectos/AdminTrading/Online/Tkinter Python/media;media/" 
-"F:/programacion/Proyectos/AdminTrading/Online/Tkinter Python/login.py"
+--icon "D:/programacion/Proyectos/AdminTrading/Online/Tkinter Python/media/img/icono.ico" 
+--add-data "D:/programacion/Proyectos/AdminTrading/Online/Tkinter Python/media;media/" 
+"D:/programacion/Proyectos/AdminTrading/Online/Tkinter Python/login.py"
 
-pyinstaller --noconfirm --onefile --windowed --icon "G:/programacion/proyectos/admintrading/online/tkinter/media/img/icono.ico" --add-data "G:/programacion/proyectos/admintrading/online/tkinter/media;media/" "G:/programacion/proyectos/admintrading/online/tkinter/login.py"
+pyinstaller --noconfirm --onefile --windowed --icon "D:/programacion/proyectos/admintrading/online/tkinter/media/img/icono.ico" --add-data "D:/programacion/proyectos/admintrading/online/tkinter/media;media/" "D:/programacion/proyectos/admintrading/online/tkinter/login.py"
