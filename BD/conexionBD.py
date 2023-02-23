@@ -2,6 +2,7 @@ import mysql.connector
 import time
 from datetime import datetime
 from calendar import monthrange
+import hashlib
 
 def conexion():
   con = mysql.connector.connect(
@@ -21,7 +22,7 @@ def conexion():
   user='root',
   password='root',
   port='3306',
-  database='admintrading_local',
+  database='admintrading',
   auth_plugin='mysql_native_password')
   cursor = con.cursor()
   cursor.close()
@@ -413,24 +414,32 @@ def sumaOperSemana(id):
   por=(suma/ValorIniSemana)*100
   return [suma,por]
 
-def verificarUsuario(usuario,contraseña):
+def verificarUsuario(usuario,contrasena):
   con=conexion()
   cur=con.cursor()
   cur.execute(f"select * from usuario where usuario='{usuario}';")
-  user=()
+  user=''
   for i in cur:
-    user=i
-  cur.execute(f"select * from usuario where contraseña='{contraseña}';")
-  contra=()
-  for i in cur:
-    contra=i
+    user=i[1]
+    contra=i[2]
+  #separo el salt y el hash
+  salt,hash=contra.split(':')
 
-  if len(user)!=0 and len(contra)!=0:
-    cur.close()
+  #combino el salt y la contraseña ingresada y luego lo hasheo
+  hash_object=hashlib.sha256((contrasena+salt).encode())
+
+  #obtengo el hash en formato hexadecimal
+  hex_dig=hash_object.hexdigest()
+
+  #compraro los hashes
+  if hex_dig==hash:
+    con.close()
     return True
   else:
-    cur.close()
+    con.close()
     return False
+
+
 
  # tabla operaciones:
   #create table operaciones

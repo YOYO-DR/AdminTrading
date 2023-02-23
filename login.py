@@ -3,6 +3,8 @@ import os
 from BD.conexionBD import *
 from tkinter import messagebox
 from principal import VentanaPrincipal
+import hashlib
+import random
 
 class VentanaLogin:
   def __init__(self):
@@ -69,9 +71,9 @@ class VentanaLogin:
   #verificar usuario valores
   def FAceptar(self):
     usuario=self.ValorUsuario.get()
-    usuario=usuario.lower().strip()
+    usuario=usuario.strip()
     contraseña=self.ValorContraseña.get()
-    contraseña=contraseña.lower().strip()
+    contraseña=contraseña.strip()
     if usuario=='':
       messagebox.showerror('Usuario', 'Usuario no puede estar vacio.')
       self.ValorContraseña.set('')
@@ -84,6 +86,7 @@ class VentanaLogin:
       self.ValorContraseña.set('')
     else:
       valor=verificarUsuario(usuario,contraseña)
+      print(usuario+' --- '+contraseña)
       if valor==True:
         self.login.destroy()
         VentanaPrincipal(obtenerIdUsuario(usuario))
@@ -204,8 +207,8 @@ class VentanaRegistro:
     usuario=usuario.strip()
     verificar=buscarUsuario(usuario)
 
-    contraseña=self.ValorContraseña.get()
-    contraseña=contraseña.strip()
+    contrasena=self.ValorContraseña.get()
+    contrasena=contrasena.strip()
 
     confi=self.ValorConfiContra.get()
     confi=confi.strip()
@@ -219,17 +222,17 @@ class VentanaRegistro:
       messagebox.showwarning('Usuario','Usuario no puede estar vacio.')
       self.ValorContraseña.set('')
       self.ValorConfiContra.set('')
-    elif contraseña=='':
+    elif contrasena=='':
       messagebox.showwarning('Contraseña','La contraseña no puede estar vacio.')
     elif confi=='':
       messagebox.showwarning('Confirmacion','La confirmacion, no puede estar vacio.')
       #Terminar ventana de registro
-    elif len(contraseña)<8 or len(contraseña)>12:
+    elif len(contrasena)<8 or len(contrasena)>12:
       messagebox.showerror('Tamaño contraseña',\
         'La contraseña debe ser de minimo 8 y maximo de 12 caracteres.')
       self.ValorContraseña.set('')
       self.ValorConfiContra.set('')
-    elif contraseña!=confi:
+    elif contrasena!=confi:
       messagebox.showerror('Confirmacion contraseña','La confirmacion no es igual a la contraseña.')
       self.ValorContraseña.set('')
       self.ValorConfiContra.set('')
@@ -241,15 +244,36 @@ class VentanaRegistro:
           messagebox.showinfo('Valor inicial','El valor inicial no puede estar vacio o ser igual a "0".')
         else:
           try:
-            registrar(usuario,contraseña,valorInicial)
+            #encriptamiento de la contrasena
+            contrasena=self.encriptar(contrasena)
+            registrar(usuario,contrasena,valorInicial)
             messagebox.showinfo('Registro','Usuario registrado')
             self.registro.destroy()
             VentanaLogin()
-          except:
+          except Exception as e:
+            print(str(e))
             messagebox.showerror('Error','Hubo un problema al registrar al usuario, vuelve a intentar.')
       except:
         messagebox.showerror('Error','El valor debe ser un numero, formato: 0.00')
         self.ValorInicialC.set('0')
+
+  def encriptar(self,contra):
+    #letras para generar el salt
+    letras='qwertyuiopasdfghjklzxcvbnm1234567890'
+    salt=''
+    #lleno el salt de forma aleatoria
+    for i in range(0,11):
+      a=int(random.randint(0,35))
+      salt+=letras[a]
+    #junto la contraseña y el sal y luego lo hasheo
+    hash_objet=hashlib.sha256((contra+salt).encode())
+    
+    #obtengo el has en formato hexadecimal
+    hex_dig = hash_objet.hexdigest()
+
+    #cojo el sal y el hash en una cadena de texto separa por ":" y ya eso se guarda en la base de datos
+    contraEncrip=salt+":"+hex_dig
+    return contraEncrip
 
 if __name__ == '__main__':
   VentanaLogin()
