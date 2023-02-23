@@ -740,18 +740,18 @@ class VentanaPrincipal:
       messagebox.showwarning('Fecha','No has introducido la fecha')
     elif idOpe=='':
       messagebox.showwarning('ID','No has introducido el ID')
-    try:
-      idOpe=int(self.valorIdOpe.get())
-    except:
-      messagebox.showwarning('ID operación','El valor no es un número entero')
-    try:
-      valor=float(self.valorUsdS.get())
-      if valor>0:
-        posOneg='+'
-    except:
-      messagebox.showwarning('Valor USD','El valor no es un número, el formato debe ser (0.0)')
-    
+  
     else:
+      try:
+        idOpe=int(self.valorIdOpe.get())
+      except:
+        messagebox.showwarning('ID operación','El valor no es un número entero')
+      try:
+        valor=float(self.valorUsdS.get())
+        if valor>0:
+          posOneg='+'
+      except:
+        messagebox.showwarning('Valor USD','El valor no es un número, el formato debe ser (0.0)')
       valorPor=round(((valor/(float(obtenerValorActual(self.IDusuario))))*100),2)
       self.confirmarVista=True
       self.vistaPrevia.config(state=NORMAL)
