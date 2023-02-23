@@ -251,20 +251,19 @@ class VentanaRegistro:
             self.registro.destroy()
             VentanaLogin()
           except Exception as e:
-            print(str(e))
             messagebox.showerror('Error','Hubo un problema al registrar al usuario, vuelve a intentar.')
       except:
         messagebox.showerror('Error','El valor debe ser un numero, formato: 0.00')
         self.ValorInicialC.set('0')
 
   def encriptar(self,contra):
-    #letras para generar el salt
-    letras='qwertyuiopasdfghjklzxcvbnm1234567890'
+    #caracteres para generar el salt
+    caracteres='qwertyuiopasdfghjklzxcvbnm1234567890!@#$%^&*()'
     salt=''
     #lleno el salt de forma aleatoria
     for i in range(0,11):
       a=int(random.randint(0,35))
-      salt+=letras[a]
+      salt+=caracteres[a]
     #junto la contraseña y el sal y luego lo hasheo
     hash_objet=hashlib.sha256((contra+salt).encode())
     

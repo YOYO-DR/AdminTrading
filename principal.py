@@ -810,7 +810,6 @@ ID: {id}'''
       b=[self.IDusuario,idActivo,valor,valorPor,fecha]
       operaciones.append(tuple(b))
       con+=1
-      print(f'{con}/{len(self.ope)}')
     sumarOperacion(sumaValores,self.IDusuario)
     guardarValores(datos=operaciones)
     self.botonSiburCSV.config(text='Guardado')
@@ -1198,8 +1197,8 @@ ID: {id}'''
                   elif self.valorCheckNeg.get()==0 and self.valorCheckPos.get()==1:
                     pos=True
                   self.operaciones=buscarOperacionesID(self.IDusuario,id1,id2,pos)
-                  import time
-                  for i in range(id1-1,id2):
+
+                  for i in range(0,len(self.operaciones)):
                     a=self.operaciones[i]
                     b=f'ID: {a[0]} - Activo: {str(a[1]).upper()} - Valor: {a[2]} USD - Fecha: {a[4]}'
                     self.resBus.insert(0,b)
@@ -1653,4 +1652,4 @@ Activo: {activo} - Valor: {valor} USD - Fecha: {fecha}''')
         self.mostrarNoOper.place(x=840,y=370)
         self.mostrarNoOper.config(text=f'N° de operaciones: {cantidad}')
 
-#VentanaPrincipal(1)
+VentanaPrincipal(1)
