@@ -229,12 +229,19 @@ def buscarOperacionesID(idUsuario,id1,id2,pos=2):
   con.close()
   return ope
 
-def guardarValores(dato=1,datos=0): 
+def guardarValores(idUsuario,dato=1,datos=0): 
   con=conexion()
   cursor=con.cursor()
   if dato==1:
-    sql="insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha,id_operacion) values (%s,%s,%s,%s,%s,%s)"
-    cursor.executemany(sql,datos)
+    opeGuardadas=0
+    for i in datos:
+      try:
+        sql="insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha,id_operacion) values (%s,%s,%s,%s,%s,%s)"
+        cursor.execute(sql,i)
+        opeGuardadas+=1
+      except Exception as e:
+        pass
+    return opeGuardadas
   elif datos==0:
     sql="insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha,id_operacion) values (%s,%s,%s,%s,%s,%s)"
     cursor.execute(sql,dato)

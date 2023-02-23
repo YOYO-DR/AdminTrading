@@ -675,7 +675,7 @@ class VentanaPrincipal:
         sumarOperacion(round((float(self.valorUsdS.get())),2),self.IDusuario)
         id_activo=buscarActivoConfi(self.valoresGuardar[1])
         self.valoresGuardar[1]=id_activo
-        guardarValores(dato=self.valoresGuardar)
+        guardarValores(self.IDusuario,dato=self.valoresGuardar)
         print(self.valoresGuardar)
         #actualizar los activos despues de guardar
         self.actuComboboxActivos()
@@ -826,8 +826,12 @@ ID: {id}'''
       b=[self.IDusuario,idActivo,valor,valorPor,fecha,idOpe]
       operaciones.append(tuple(b))
       con+=1
-    sumarOperacion(sumaValores,self.IDusuario)
-    guardarValores(datos=operaciones)
+    opeGuardados=guardarValores(self.IDusuario,datos=operaciones)
+    if opeGuardados>0:
+      messagebox.showwarning('Operaciones guardadas',f'Se guardaron {opeGuardados} operaciones')
+      sumarOperacion(sumaValores,self.IDusuario)
+    elif opeGuardados==0:
+      messagebox.showwarning('Operaciones guardadas',f'No hay nuevas operaciones para guardar')
     self.botonSiburCSV.config(text='Guardado')
     self.actuActualGanPer()
     self.actuComboboxActivos()
