@@ -4,7 +4,7 @@ from datetime import datetime
 from calendar import monthrange
 import hashlib
 
-def conexion():
+""" def conexion():
   con = mysql.connector.connect(
   host='20.168.252.60',#'192.168.110.47',
   user='yoyo',#'user',
@@ -14,9 +14,9 @@ def conexion():
   auth_plugin='mysql_native_password')
   cursor = con.cursor()
   cursor.close()
-  return con  
+  return con   """
 
-""" def conexion():
+def conexion():
   con = mysql.connector.connect(
   host='127.0.0.1',
   user='root',
@@ -26,7 +26,7 @@ def conexion():
   auth_plugin='mysql_native_password')
   cursor = con.cursor()
   cursor.close()
-  return con """
+  return con
 
 def actualizarOperacion(idOpe,activo,valor,fecha):
   con=conexion()
@@ -233,10 +233,10 @@ def guardarValores(dato=1,datos=0):
   con=conexion()
   cursor=con.cursor()
   if dato==1:
-    sql="insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha) values (%s,%s,%s,%s,%s)"
+    sql="insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha,id_operacion) values (%s,%s,%s,%s,%s,%s)"
     cursor.executemany(sql,datos)
   elif datos==0:
-    sql="insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha) values (%s,%s,%s,%s,%s)"
+    sql="insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha,id_operacion) values (%s,%s,%s,%s,%s,%s)"
     cursor.execute(sql,dato)
   con.commit()
   con.close()

@@ -1,22 +1,22 @@
 create database admintrading_v2;
 use admintrading_v2;
 create table activo(
-id smallint auto_increment primary key,
+id int auto_increment primary key,
 nombre_activo varchar(100)
 );
 create table usuario(
-id smallint auto_increment primary key,
+id int auto_increment primary key,
 usuario varchar(100),
-contrasela varchar(100),
+contraseña varchar(100),
 inicioCuenta decimal(9,2),
 totalActual decimal(9,2)
 );
 
 create table operaciones(
-id smallint auto_increment primary key,
-id_operacion smallint unique,
-id_usuario smallint,
-id_activo smallint,
+id int auto_increment primary key,
+-- id_operacion int unique,
+id_usuario int,
+id_activo int,
 foreign key (id_usuario) references usuario (id),
 foreign key (id_activo) references activo (id),
 valor decimal(9,2),

@@ -11,9 +11,9 @@ from LeerarchivosCSV.leerCSV import *
 class VentanaPrincipal:
   def __init__(self,id):
     self.root=Tk()
-    self.root.geometry('1050x600+100+50')
+    #self.root.geometry('1050x600+100+50')
     self.root.geometry('1050x600+1500+50')
-    #self.root.resizable(width=False,height=False)
+    self.root.resizable(width=False,height=False)
     self.root.title('AdminTrading')
     self.IDusuario=id
     #-------------------------------------------------------------------------------#
@@ -107,7 +107,6 @@ class VentanaPrincipal:
 
     #entry de Valor usd
     self.valorUsdS=StringVar()
-    self.valorUsdS.set('0')
     self.valorUsdE=Entry(self.root,textvariable=self.valorUsdS)
     self.valorUsdE.config(font=('Leelawadee UI Semilight',11))
     self.valorUsdE.place(x=20,y=160)
@@ -128,20 +127,30 @@ class VentanaPrincipal:
     font=('Leelawadee UI Semilight',9,'bold'),command=self.limpiarOpe,width=8)
     self.botonLimpiarOpe.place(x=110,y=187)
 
+    #label de ID operacion
+    self.idOpeL=Label(self.root,text='ID operación',bg='grey90',font=('Leelawadee UI Semilight',12))
+    self.idOpeL.place(x=140,y=85)
+
+    #entry de ID operacion
+    self.valorIdOpe=StringVar()
+    self.idOpeE=Entry(self.root,textvariable=self.valorIdOpe)
+    self.idOpeE.config(font=('Leelawadee UI Semilight',11),width=10)
+    self.idOpeE.place(x=140,y=110)
+
     #label fecha
     self.fechaL=Label(self.root,text='Fecha (AAAA-MM-DD)',bg='grey90',font=('Leelawadee UI Semilight',12))
-    self.fechaL.place(x=195,y=85)
+    self.fechaL.place(x=255,y=85)
 
     #entry de fecha
     self.valorFecha=StringVar()
     self.fechaE=Entry(self.root,textvariable=self.valorFecha)
     self.fechaE.config(font=('Leelawadee UI Semilight',11))
-    self.fechaE.place(x=195,y=110)
+    self.fechaE.place(x=255,y=110)
 
     #boton de fecha 'hoy'
     self.fechaHoy=Button(self.root,text='Hoy',bg='#92e27a',\
     font=('Leelawadee UI Semilight',8,'bold'),command=self.fechaHoyB)
-    self.fechaHoy.place(x=365,y=110)
+    self.fechaHoy.place(x=425,y=110)
 
     #apartado de salida de vista previa de la operacion ingresada
     self.vistaP=Canvas(self.root,width=315,height=80,bg='grey90')
@@ -160,7 +169,7 @@ class VentanaPrincipal:
 
     #boton para subir CSV
     self.botonSiburCSV=Button(self.root,text='Subir CSV',font=('Leelawadee UI Semilight',10,'bold'),bg='#6eb8f5',command=self.ingresarCSV)
-    self.botonSiburCSV.place(x=430,y=58)
+    self.botonSiburCSV.place(x=425,y=60)
 
     #---------------------------------------------------------------------------------#
     #----------------------elementos del apartado de calculadora----------------------#
@@ -643,7 +652,7 @@ class VentanaPrincipal:
       else:
         self.botonVeri.config(bg='#ff7676')
 
-#----------------------funciones del apartado de operaciones----------------------#
+#----------------------funciones del apartado de ingresar operaciones----------------------#
   def actuActualGanPer(self):
     self.MValorActual=obtenerValorActual(self.IDusuario)
     self.tituloB.config(text=f'Inicio: {self.valorInicioMostrar}   Actual: {self.MValorActual}')
@@ -717,43 +726,49 @@ class VentanaPrincipal:
 
   def verVistaP(self):
     activo=self.activoSelect.get().lower()
-    try:
-      valor=float(self.valorUsdS.get())
-
-    except:
-      messagebox.showwarning('Valor USD','El valor no es un número, el formato debe ser (0.0)')
     fecha=self.valorFecha.get()
     id=siguienteID()
-    valorPor=round(((valor/(float(obtenerValorActual(self.IDusuario))))*100),2)
-    
+    valor=self.valorUsdS.get()
+    idOpe=self.valorIdOpe.get()
     posOneg=''
-    if valor>0:
-      posOneg='+'
     #Verificar todos los campos antes de mostrar la vista previa
     if activo=='':
       messagebox.showwarning('Activo','No has seleccionado un activo')
-    elif valor==0:
+    elif valor=='':
       messagebox.showwarning('Valor USD','No has puesto un valor a guardar')
     elif fecha=='':
       messagebox.showwarning('Fecha','No has introducido la fecha')
-
+    elif idOpe=='':
+      messagebox.showwarning('ID','No has introducido el ID')
+    try:
+      idOpe=int(self.valorIdOpe.get())
+    except:
+      messagebox.showwarning('ID operación','El valor no es un número entero')
+    try:
+      valor=float(self.valorUsdS.get())
+      if valor>0:
+        posOneg='+'
+    except:
+      messagebox.showwarning('Valor USD','El valor no es un número, el formato debe ser (0.0)')
+    
     else:
+      valorPor=round(((valor/(float(obtenerValorActual(self.IDusuario))))*100),2)
       self.confirmarVista=True
       self.vistaPrevia.config(state=NORMAL)
       self.vistaPrevia.delete('1.0',END)
       insertar=f'''Activo: {activo}
 Valor: {posOneg}{valor}  Valor %: {posOneg}{valorPor}%
-Fecha: {fecha}
+Fecha: {fecha}  ID operación: {idOpe}
 ID: {id}'''
       self.vistaPrevia.insert('1.0',insertar)
       self.vistaPrevia.config(state=DISABLED)
-      self.valoresGuardar=[self.IDusuario,activo,valor,valorPor,fecha]
+      self.valoresGuardar=[self.IDusuario,activo,valor,valorPor,fecha,idOpe]
       
   def limpiarOpe(self):
     self.valoresGuardar=[self.IDusuario]
     self.confirmarVista=False
     self.activoSelect.set('')
-    self.valorUsdS.set('0')
+    self.valorUsdS.set('')
     self.valorFecha.set('')
     self.vistaPrevia.config(state=NORMAL)
     self.vistaPrevia.delete('1.0',END)
@@ -807,7 +822,8 @@ ID: {id}'''
       sumaValores+=valor
       valorPor=round(((valor/(float(valorActual)))*100),2)
       fecha=self.ope[i-1]['fecha']
-      b=[self.IDusuario,idActivo,valor,valorPor,fecha]
+      idOpe=self.ope[i-1]['id']
+      b=[self.IDusuario,idActivo,valor,valorPor,fecha,idOpe]
       operaciones.append(tuple(b))
       con+=1
     sumarOperacion(sumaValores,self.IDusuario)
