@@ -11,8 +11,8 @@ from LeerarchivosCSV.leerCSV import *
 class VentanaPrincipal:
   def __init__(self,id):
     self.root=Tk()
-    #self.root.geometry('1050x600+100+50')
-    self.root.geometry('1050x600+1500+50')
+    self.root.geometry('1050x600+100+50')
+    #self.root.geometry('1050x600+1500+50')
     self.root.resizable(width=False,height=False)
     self.root.title('AdminTrading')
     self.IDusuario=id
