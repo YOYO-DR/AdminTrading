@@ -239,8 +239,7 @@ def guardarValores(idUsuario,dato=1,datos=0):
         sql="insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha,id_operacion) values (%s,%s,%s,%s,%s,%s)"
         cursor.execute(sql,i)
         opeGuardadas+=1
-      except Exception as e:
-        print(str(e))
+      except:
         pass
   elif datos==0:
     sql="insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha,id_operacion) values (%s,%s,%s,%s,%s,%s)"
