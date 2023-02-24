@@ -1672,4 +1672,4 @@ Activo: {activo} - Valor: {valor} USD - Fecha: {fecha}''')
         self.mostrarNoOper.place(x=840,y=370)
         self.mostrarNoOper.config(text=f'N° de operaciones: {cantidad}')
 
-VentanaPrincipal(1)
+#VentanaPrincipal(1)
