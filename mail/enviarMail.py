@@ -41,3 +41,4 @@ servidor.sendmail(usuario_smtp, 'duranyoiner86@gmail.com', texto)
 servidor.quit()
 
 print('Correo electrónico enviado con éxito')
+

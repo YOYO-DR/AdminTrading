@@ -86,7 +86,6 @@ class VentanaLogin:
       self.ValorContraseña.set('')
     else:
       valor=verificarUsuario(usuario,contraseña)
-      print(usuario+' --- '+contraseña)
       if valor==True:
         self.login.destroy()
         VentanaPrincipal(obtenerIdUsuario(usuario))

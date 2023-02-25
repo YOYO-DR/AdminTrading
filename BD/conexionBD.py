@@ -247,7 +247,6 @@ def guardarValores(idUsuario,dato=1,datos=0):
   con.commit()
   con.close()
   return opeGuardadas
-  
 
 def obtenerIdUsuario(usuario):
   con=conexion()
