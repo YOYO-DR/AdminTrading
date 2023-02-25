@@ -5,6 +5,7 @@ from tkinter import messagebox
 from principal import VentanaPrincipal
 import hashlib
 import random
+import re
 
 class VentanaLogin:
   def __init__(self):
@@ -12,7 +13,7 @@ class VentanaLogin:
     self.login = Tk()
     self.login.config(bg='#a6a6a6')
     #asigno tamaño y posicion
-    self.login.geometry("400x500+470+85")
+    self.login.geometry("400x520+470+85")
     #bloqueo la modificacion de las posiciones
     self.login.resizable(width=False, height=False)
     #titulo de la ventana
@@ -24,7 +25,7 @@ class VentanaLogin:
 #----------------------------------------------------------------#
     #boton para la confirmacion de conexion
     self.confiConexionB=Button(self.login,width=60,height=1,bg='red',command=self.confiConexion)
-    self.confiConexionB.place(x=-1,y=480)
+    self.confiConexionB.place(x=-1,y=500)
     self.confiConexion()
 
     self.bienvenida=Label(self.login,bg='#a6a6a6', text='¡BIENVENIDO!\nInicia sesión',\
@@ -49,7 +50,7 @@ class VentanaLogin:
     font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorContraseña,show='*').place(x=130,y=316)
 
     #botones aceptar y cancelar
-    self.botonAceptar=Button(self.login,bg='#8c8c8c',text='Aceptar',command=self.FAceptar)
+    self.botonAceptar=Button(self.login,bg='#038554',text='Aceptar',command=self.FAceptar)
     self.botonAceptar.place(x=130,y=355)
     self.botonAceptar.config(width=22)
 
@@ -65,6 +66,11 @@ class VentanaLogin:
     self.botonRegistrar=Button(self.login,bg='#038554',text='Registrar',command=self.FRegistro)
     self.botonRegistrar.place(x=130,y=430)
     self.botonRegistrar.config(width=22)
+
+    #boton recuperar contraseña
+    self.botonOlvidoContra=Button(self.login,bg='#e26a2c',text='¿Olvido su contraseña?',command=self.RContra)
+    self.botonOlvidoContra.place(x=130,y=460)
+    self.botonOlvidoContra.config(width=22)
     #funcion ultima para que la ventana mantenga activa
     self.login.mainloop()
   
@@ -116,15 +122,68 @@ class VentanaLogin:
       self.confiConexionB.config(bg='green')
     else:
       self.confiConexionB.config(bg='red')
+  
+  #recuperacion de contraseña
+  def RContra(self):
+    self.login.destroy()
+    RecuperarContra()
+#------------------------------------Ventana recuperar contraseña------------------------------#
+class RecuperarContra():
+  def __init__(self):
+    self.root=Tk()
+    self.root.title("Inicio de sesión")
+    self.root.geometry("400x200+470+85")
+    self.root.resizable(False, False)
+    self.root.config(bg='#a6a6a6')
 
-#------------------------------------Ventana registro--------------------------------
+    #label info
+    self.infoLabel=Label(self.root,text='¿Olvido su contraseña',font=('Leelawadee UI Semilight',15),bg='#a6a6a6')
+    self.infoLabel.pack(anchor='center')
+
+    #Label correo
+    self.correoLabel=Label(self.root,text='Correo:',font=('Leelawadee UI Semilight',15),bg='#a6a6a6')
+    self.correoLabel.place(x=45,y=40)
+
+    #Entry correo
+    self.valorCorreoEntry=StringVar()
+    self.correoEntry=Entry(self.root,width=26,bg='#8c8c8c',\
+    font=('Leelawadee UI Semilight',13),fg='black',textvariable=self.valorCorreoEntry)
+    self.correoEntry.place(x=50,y=75)
+
+    #boton verificar
+    self.botonVerificar=Button(self.root,bg='#038554',text='Verificar',command=self.recuperarContra)
+    self.botonVerificar.place(x=50,y=115)
+
+    #boton volver al inicio
+    self.botonInicio=Button(self.root,bg='#038554',text='Volver al inicio',command=self.volverInicio)
+    self.botonInicio.place(x=120,y=115)
+
+    self.root.mainloop()
+
+  def recuperarContra(self):
+    correo=self.valorCorreoEntry.get().strip()
+    if correo=='':
+      messagebox.showerror('Correo', 'Correo no puede estar vacio.')
+    else:
+    #verificar el correo en la base de datos
+      if not verificarCorreo(correo):
+        messagebox.showwarning('Correo','el correo no esta registrado, vuelve a intentar.')
+      else:
+        #crear funcion para el envio del codigo
+        
+        pass
+
+  def volverInicio(self):
+    self.root.destroy()
+    VentanaLogin()
+#------------------------------------Ventana registro--------------------------------#
 
 class VentanaRegistro:
   def __init__(self):
     self.registro = Tk()
     self.registro.config(bg='#a6a6a6')
     #asigno tamaño y posicion
-    self.registro.geometry("400x500+470+85")
+    self.registro.geometry("400x540+470+65")
     #bloqueo la modificacion de las posiciones
     self.registro.resizable(width=False, height=False)
     #titulo de la ventana
@@ -164,31 +223,38 @@ class VentanaRegistro:
     self.confiContra=Entry(self.registro,width=18,bg='#8c8c8c',\
     font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorConfiContra,show='*').place(x=195,y=311)
 
+    #entry de correo
+    self.correo=Label(self.registro,bg='#a6a6a6', text='Correo:',\
+    font=('Leelawadee UI Semilight',15)).place(x=125,y=345)
+    self.ValorCorreo=StringVar()
+    self.correo=Entry(self.registro,width=18,bg='#8c8c8c',\
+    font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorCorreo).place(x=195,y=351)
+
     #entry de valor inicial de la cuenta
     self.valorInicial=Label(self.registro,bg='#a6a6a6', text='Valor de la cuenta:',\
-    font=('Leelawadee UI Semilight',15)).place(x=30,y=345)
+    font=('Leelawadee UI Semilight',15)).place(x=30,y=385)
     self.ValorInicialC=StringVar()
     self.valorInicial=Entry(self.registro,width=18,bg='#8c8c8c',\
-    font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorInicialC).place(x=195,y=351)
+    font=('Leelawadee UI Semilight',13),fg='white',textvariable=self.ValorInicialC).place(x=195,y=391)
     self.ValorInicialC.set('0')
 
     #boton registrar
     self.botonAceptar=Button(self.registro,bg='#038554',text='Registrar',command=self.FRegistro)
-    self.botonAceptar.place(x=125,y=390)
+    self.botonAceptar.place(x=125,y=430)
     self.botonAceptar.config(width=22)
 
     #boton volver login
     self.botonVLogin=Button(self.registro,bg='#8c8c8c',text='Volver al inicio',command=self.volverLogin)
-    self.botonVLogin.place(x=125,y=420)
+    self.botonVLogin.place(x=125,y=460)
     self.botonVLogin.config(width=22)
 
     #label separador
     self.separador=Canvas(self.registro,width=164,height=3,bd=-2,bg='grey40')
-    self.separador.place(x=125,y=452)
+    self.separador.place(x=125,y=492)
 
     #boton cancelar
     self.botonCancelar=Button(self.registro,bg='#ac3a3a',text='Cancelar',command=self.FCancelar)
-    self.botonCancelar.place(x=125,y=460)
+    self.botonCancelar.place(x=125,y=500)
     self.botonCancelar.config(width=22)
 
 
@@ -202,15 +268,23 @@ class VentanaRegistro:
       self.registro.destroy()
       
   def FRegistro(self):
+    #Usuario
     usuario=self.ValorUsuario.get()
     usuario=usuario.strip()
     verificar=buscarUsuario(usuario)
 
+    #contraseña
     contrasena=self.ValorContraseña.get()
     contrasena=contrasena.strip()
 
+    #confiramcion de contraseña
     confi=self.ValorConfiContra.get()
     confi=confi.strip()
+
+    #correo
+    correo=self.ValorCorreo.get()
+    correo=correo.strip().lower()
+
 
     if verificar==True:
       messagebox.showwarning('Usuario','El nombre de usuario ya existe, elige otro.')
@@ -225,7 +299,8 @@ class VentanaRegistro:
       messagebox.showwarning('Contraseña','La contraseña no puede estar vacio.')
     elif confi=='':
       messagebox.showwarning('Confirmacion','La confirmacion, no puede estar vacio.')
-      #Terminar ventana de registro
+    elif correo=='':
+      messagebox.showwarning('Correo','Debe ingresar un correo')
     elif len(contrasena)<8 or len(contrasena)>12:
       messagebox.showerror('Tamaño contraseña',\
         'La contraseña debe ser de minimo 8 y maximo de 12 caracteres.')
@@ -236,24 +311,34 @@ class VentanaRegistro:
       self.ValorContraseña.set('')
       self.ValorConfiContra.set('')
     else:
-      try:
-        valorInicial=float(self.ValorInicialC.get())
-        valorInicial=round(valorInicial,2)
-        if valorInicial==0:
-          messagebox.showinfo('Valor inicial','El valor inicial no puede estar vacio o ser igual a "0".')
-        else:
-          try:
-            #encriptamiento de la contrasena
-            contrasena=self.encriptar(contrasena)
-            registrar(usuario,contrasena,valorInicial)
-            messagebox.showinfo('Registro','Usuario registrado')
-            self.registro.destroy()
-            VentanaLogin()
-          except Exception as e:
-            messagebox.showerror('Error','Hubo un problema al registrar al usuario, vuelve a intentar.')
-      except:
-        messagebox.showerror('Error','El valor debe ser un numero, formato: 0.00')
-        self.ValorInicialC.set('0')
+      if self.validarCorreo(correo):
+        try:
+          valorInicial=float(self.ValorInicialC.get())
+          valorInicial=round(valorInicial,2)
+          if valorInicial==0:
+            messagebox.showinfo('Valor inicial','El valor inicial no puede estar vacio o ser igual a "0".')
+          else:
+            try:
+              #encriptamiento de la contrasena
+              contrasena=self.encriptar(contrasena)
+              registrar(usuario,contrasena,valorInicial,correo)
+              messagebox.showinfo('Registro','Usuario registrado')
+              self.registro.destroy()
+              VentanaLogin()
+            except Exception as e:
+              print(str(e))
+              messagebox.showerror('Error','Hubo un problema al registrar al usuario, vuelve a intentar.')
+        except:
+          messagebox.showerror('Error','El valor debe ser un numero, formato: 0.00')
+          self.ValorInicialC.set('0')
+      else:
+        messagebox.showerror('Correo','Debe ingresar un correo valido')
+  def validarCorreo(self,correo):
+    expresion_regular=r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if re.match(expresion_regular,correo):
+      return True
+    else:
+      return False
 
   def encriptar(self,contra):
     #caracteres para generar el salt

@@ -1,4 +1,4 @@
-from tkinter import Label,Tk,StringVar,Entry,Button,PhotoImage,messagebox
+from tkinter import Label,Tk,StringVar,Entry,Button,PhotoImage,messagebox,Toplevel
 import tkinter.ttk as ttk
 import hashlib
 import mysql.connector
@@ -171,6 +171,12 @@ class Principal():
     self.root.resizable(False, False)
     self.root.config(bg="black")
 
+    #boton de ajustes
+    self.botonAjustes()
+
+    #label de bienvenida
+    self.saludo()
+
     self.botonAjustes()
 
     self.root.mainloop()
@@ -182,13 +188,38 @@ class Principal():
         nombre=i[1]
      return nombre
   def botonAjustes(self):
-     pass #aqui voy
-  
+    def llamarVentana():
+      Ajustes(self.root)
+    self.imgAjus=PhotoImage(file=os.path.join(os.path.join(os.path.dirname(__file__),'media'),'ajustes.png')).subsample(2)
+    self.botonAjus=Button(image=self.imgAjus,bg='black',bd=0,command=llamarVentana)
+    self.botonAjus.place(x=243,y=5)
+
+  def saludo(self):
+    self.saludoLabel=Label(self.root,text=f'Hola usuario {self.nomUsuario.title()}\n¡Bienvenido!',bg='black',fg='white',font=('Leelawadee UI Semilight',14,'bold'))
+    self.saludoLabel.pack(anchor='center')
+    
 class Registrar():
    def __init__(self):
       print('Te vas a registrar!')
 
+class Ajustes():
+  def __init__(self,ventana):
+      self.root=Toplevel(ventana)
+      self.root.grab_set()
+      self.root.title('Ajustes')
+      self.root.geometry("300x300")
+      self.root.resizable(False, False)
+      self.root.config(bg="black")
+
+      self.entryCambiarContra()
+    
+  def entryCambiarContra(self):
+      
+      #Label 
+      pass
+
+   
 if __name__ == '__main__':
-  #Inicio()
-  Principal(1)
+  Inicio()
+  #Principal(1)
 

@@ -4,7 +4,7 @@ from datetime import datetime
 from calendar import monthrange
 import hashlib
 
-def conexion():
+""" def conexion():
   con = mysql.connector.connect(
   host='20.168.252.60',#'192.168.110.47',
   user='yoyo',#'user',
@@ -14,7 +14,7 @@ def conexion():
   auth_plugin='mysql_native_password')
   cursor = con.cursor()
   cursor.close()
-  return con  
+  return con   """
 
 """ def conexion():
   con = mysql.connector.connect(
@@ -28,6 +28,17 @@ def conexion():
   cursor.close()
   return con """
 
+def conexion():
+  con = mysql.connector.connect(
+  host='127.0.0.1',
+  user='root',
+  password='root',
+  port='3306',
+  database='admintrading_cambiarContra',
+  auth_plugin='mysql_native_password')
+  cursor = con.cursor()
+  cursor.close()
+  return con
 def actualizarOperacion(idOpe,activo,valor,fecha):
   con=conexion()
   cursor=con.cursor()
@@ -297,10 +308,10 @@ def obtenActivos():
   con.close()
   return activosOrden
 
-def registrar(usuario, contraseña,valorInicial):
+def registrar(usuario, contraseña,valorInicial,correo):
   con=conexion()
   cursor=con.cursor()
-  cursor.execute(f"insert into usuario(usuario,contraseña,inicioCuenta,totalActual) values('{usuario}','{contraseña}',{valorInicial},{valorInicial});")
+  cursor.execute(f"insert into usuario(usuario,contraseña,inicioCuenta,totalActual,correo) values('{usuario}','{contraseña}',{valorInicial},{valorInicial},'{correo}');")
   con.commit()
   cursor.close()
 
@@ -462,5 +473,20 @@ def verificarUsuario(usuario,contrasena):
   # foreign key(id_activo) references activo(id)
   # );
   
+def verificarCorreo(correo):
+  con=conexion()
+  cur=con.cursor()
+  cur.execute(f"select correo from usuario where correo='{correo}';")
+  bus=''
+  for i in cur:
+    bus=i
+  if str(bus).strip()=='':
+    con.close()
+    return False
+  else:
+    con.close()
+    return True
+
+
 
 #insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha) values (1,4,-1.03,-1.03,'2022-11-23');

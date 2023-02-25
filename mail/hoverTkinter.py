@@ -21,8 +21,8 @@ def bttn(x,y,text,bcolor,fcolor):
                   activebackground=bcolor,
                   command=cmd)
   
-  myButton.bind("<Enter>", on_enter)
-  myButton.bind("<Leave>", on_leave)
+  myButton.bind("<Enter>", on_enter) #cuadno el mouse entra al boton o widget
+  myButton.bind("<Leave>", on_leave) #cuadno el mouse sale del boton o widget
 
   myButton.pack(anchor='center',ipady=5)
   #myButton.place(x=0,y=0)
