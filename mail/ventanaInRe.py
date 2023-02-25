@@ -49,7 +49,7 @@ class Inicio():
 
     #entry de contraseña
     self.contraEntryValor=StringVar()
-    self.contraEntry=Entry(self.root,width=20,font=('Leelawadee UI Semilight',10),textvariable=self.contraEntryValor)
+    self.contraEntry=Entry(self.root,width=20,font=('Leelawadee UI Semilight',10),textvariable=self.contraEntryValor,show='*')
     self.contraEntry.pack(anchor='center',pady=5)
 
 
@@ -148,6 +148,7 @@ class Inicio():
 
       #comparo los hash
       if hash==hashHexNew:
+        #si es verdaderi, habro la ventana principal
         self.root.destroy()
         Principal(idUsuario())
       else:
@@ -161,13 +162,33 @@ class Inicio():
      Registrar()
 
 class Principal():
-   def __init__(self, idUsuario):
-      print('Inicio de sesión correcto!')
+  def __init__(self, idUsuario):
+    self.idUsuario = idUsuario
+    self.nomUsuario=self.nombreUsuario(idUsuario)
+    self.root = Tk()
+    self.root.title(f'Hola, {self.nomUsuario.title()}')
+    self.root.geometry("300x300")
+    self.root.resizable(False, False)
+    self.root.config(bg="black")
 
+    self.botonAjustes()
+
+    self.root.mainloop()
+  def nombreUsuario(self,idUsuario):
+     conn=conexion()
+     cursor=conn.cursor()
+     cursor.execute(f"SELECT * FROM usuarios WHERE id={idUsuario}")
+     for i in cursor:
+        nombre=i[1]
+     return nombre
+  def botonAjustes(self):
+     pass #aqui voy
+  
 class Registrar():
    def __init__(self):
       print('Te vas a registrar!')
 
 if __name__ == '__main__':
-  Inicio()
+  #Inicio()
+  Principal(1)
 
