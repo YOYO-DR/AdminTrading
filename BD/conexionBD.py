@@ -3,12 +3,13 @@ import time
 from datetime import datetime
 from calendar import monthrange
 import hashlib
+from datos import *
 
 """ def conexion():
   con = mysql.connector.connect(
-  host='20.168.252.60',#'192.168.110.47',
-  user='yoyo',#'user',
-  password='119351',#'root',
+  host=host,
+  user=user,
+  password=password,
   port='3306',
   database='admintrading_cambiarContra',
   auth_plugin='mysql_native_password')
