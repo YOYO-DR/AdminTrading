@@ -6,6 +6,7 @@ from principal import VentanaPrincipal
 import hashlib
 import random
 import re
+from enviarCorreo import *
 
 class VentanaLogin:
   def __init__(self):
@@ -170,8 +171,28 @@ class RecuperarContra():
         messagebox.showwarning('Correo','el correo no esta registrado, vuelve a intentar.')
       else:
         #crear funcion para el envio del codigo
-        
-        pass
+        #generar codigo
+        letras='abcdefghijklmnopqrstuvwxyz1234567890'
+        codigo=''
+        for i in range(0,8):
+          a=letras[random.randint(0,35)]
+          if not a in codigo:
+            codigo+=letras[random.randint(0,35)]
+          else:
+            i-=1
+
+        #asunto del correo a enviar
+        asunto='Admintrading - Codigo de verificación.'
+        #cuerpo del mensaje a enviar
+        cuerpo=f'''Codigo de verificación
+  El codigo de verificación solo será funcional por 5 min, despues de eso, tendra que generar el codigo de nuevo.
+  Codigo: {codigo}'''
+        confiEnvio=enviarCodigo(correo,asunto,cuerpo)
+        if not confiEnvio:
+          messagebox.showinfo('Codigo de verificación','Hubo un error enviando el correo de verificación, intenta nuevamente.')
+        else:
+          #entry codigo
+          pass
 
   def volverInicio(self):
     self.root.destroy()
@@ -333,6 +354,7 @@ class VentanaRegistro:
           self.ValorInicialC.set('0')
       else:
         messagebox.showerror('Correo','Debe ingresar un correo valido')
+  
   def validarCorreo(self,correo):
     expresion_regular=r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     if re.match(expresion_regular,correo):

@@ -10,7 +10,7 @@ import hashlib
   user='yoyo',#'user',
   password='119351',#'root',
   port='3306',
-  database='admintrading',
+  database='admintrading_cambiarContra',
   auth_plugin='mysql_native_password')
   cursor = con.cursor()
   cursor.close()
