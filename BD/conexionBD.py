@@ -487,6 +487,12 @@ def verificarCorreo(correo):
     con.close()
     return True
 
+def cambioContraseña(contra,correo):
+  con=conexion()
+  cursor=con.cursor()
+  cursor.execute(f"update usuario set contraseña='{contra}' where correo='{correo}'")
+  con.commit()
+  con.close()
 
 
 #insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha) values (1,4,-1.03,-1.03,'2022-11-23');

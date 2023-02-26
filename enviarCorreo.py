@@ -19,7 +19,7 @@ def enviarCodigo(enviar,asunto,cuerpo):
 
     # Añadir el cuerpo del mensaje
     cuerpo_mensaje = cuerpo
-    mensaje.attach(MIMEText(cuerpo_mensaje, 'plain'))
+    mensaje.attach(MIMEText(cuerpo_mensaje, 'html'))
 
     # Crear la conexión al servidor SMTP
     servidor = smtplib.SMTP(servidor_smtp, puerto_smtp)

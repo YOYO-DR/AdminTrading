@@ -133,12 +133,13 @@ class RecuperarContra():
   def __init__(self):
     self.root=Tk()
     self.root.title("Inicio de sesión")
-    self.root.geometry("400x200+470+85")
+    self.root.geometry("330x200+470+85")
     self.root.resizable(False, False)
     self.root.config(bg='#a6a6a6')
+    self.root.title('Cambiar contraseña')
 
     #label info
-    self.infoLabel=Label(self.root,text='¿Olvido su contraseña',font=('Leelawadee UI Semilight',15),bg='#a6a6a6')
+    self.infoLabel=Label(self.root,text='¿Olvido su contraseña?',font=('Leelawadee UI Semilight',15),bg='#a6a6a6')
     self.infoLabel.pack(anchor='center')
 
     #Label correo
@@ -156,7 +157,7 @@ class RecuperarContra():
     self.botonVerificar.place(x=50,y=115)
 
     #boton volver al inicio
-    self.botonInicio=Button(self.root,bg='#038554',text='Volver al inicio',command=self.volverInicio)
+    self.botonInicio=Button(self.root,bg='#e26a2c',text='Volver al inicio',command=self.volverInicio)
     self.botonInicio.place(x=120,y=115)
 
     self.root.mainloop()
@@ -173,27 +174,155 @@ class RecuperarContra():
         #crear funcion para el envio del codigo
         #generar codigo
         letras='abcdefghijklmnopqrstuvwxyz1234567890'
-        codigo=''
+        self.codigoEnvio=''
         for i in range(0,8):
           a=letras[random.randint(0,35)]
-          if not a in codigo:
-            codigo+=letras[random.randint(0,35)]
+          if not a in self.codigoEnvio:
+            self.codigoEnvio+=letras[random.randint(0,35)]
           else:
             i-=1
 
         #asunto del correo a enviar
-        asunto='Admintrading - Codigo de verificación.'
+        self.asunto='Admintrading - Codigo de verificación.'
         #cuerpo del mensaje a enviar
-        cuerpo=f'''Codigo de verificación
-  El codigo de verificación solo será funcional por 5 min, despues de eso, tendra que generar el codigo de nuevo.
-  Codigo: {codigo}'''
-        confiEnvio=enviarCodigo(correo,asunto,cuerpo)
+        self.cuerpo=f'''<b>Codigo:</b> <i>{self.codigoEnvio}</i>'''
+        confiEnvio=enviarCodigo(correo,self.asunto,self.cuerpo)
         if not confiEnvio:
           messagebox.showinfo('Codigo de verificación','Hubo un error enviando el correo de verificación, intenta nuevamente.')
         else:
-          #entry codigo
-          pass
+          #reacomodar el tamaño de la pantalla
+          self.root.geometry('330x280+470+85')
 
+          #desactivar entry del correo y boton
+          self.correoEntry.config(state='disabled')
+          self.botonVerificar.config(state='disabled')
+          
+          #Label codigo
+          self.codigoLabel=Label(self.root,text='Codigo:',font=('Leelawadee UI Semilight',15),bg='#a6a6a6')
+          self.codigoLabel.place(x=45,y=140) 
+
+          #Entry del codigo
+          self.valorCodigoEntry=StringVar()
+          self.codigoEntry=Entry(self.root,width=26,bg='#8c8c8c',\
+          font=('Leelawadee UI Semilight',13),fg='black',textvariable=self.valorCodigoEntry)
+          self.codigoEntry.place(x=50,y=180)
+
+          #boton de verificar codigo
+          #boton verificar
+          self.verificarCodi=Button(self.root,bg='#038554',text='Verificar',command=self.cambiarContra)
+          self.verificarCodi.place(x=50,y=215)
+
+          #boton enviar codigo de nuevo
+          self.enviarCodeDeNuevo=Button(self.root,bg='#e26a2c',text='Enviar codigo de nuevo',command=self.enviarCode)
+          self.enviarCodeDeNuevo.place(x=120,y=215)
+
+  def enviarCode(self):
+    confiEnvio=enviarCodigo(self.valorCorreoEntry.get().strip(),self.asunto,self.cuerpo)
+    if not confiEnvio:
+      messagebox.showinfo('Codigo de verificación','Hubo un error enviando el correo de verificación, intenta nuevamente.')
+
+  def cambiarContra(self):
+    #compara codigos
+    if not self.valorCodigoEntry.get()==self.codigoEnvio:
+      messagebox.showerror('Codigo de verificación', 'El codigo de verificación ingresado no es correcto.')
+    else:
+      self.verificacionCorrecta()
+
+    #crear ventana de cambiar contraseña
+    pass
+
+  def verificacionCorrecta(self):
+    #modificar ventana
+    self.root.title('Cambiar contraseña')
+    self.root.geometry("285x220+470+85")
+
+    #modificar titulo
+    self.infoLabel.config(text='Cambiar contraseña')
+
+    #modificar label correo por "contraseña"
+    self.correoLabel.config(text='Contraseña:')
+
+    #ocultar botones
+    self.botonVerificar.place_forget()
+    self.verificarCodi.place_forget()
+    self.enviarCodeDeNuevo.place_forget()
+
+    #reposicionar boton de volver al inicio
+    self.botonInicio.place(x=145,y=185)
+
+    #ocultar entry correo
+    self.correoEntry.place_forget()
+
+    #crear entry contraseña
+    self.valorContra=StringVar()
+    self.contraEntry=Entry(self.root,width=20,bg='#8c8c8c',\
+    font=('Leelawadee UI Semilight',13),fg='black',textvariable=self.valorContra,show='*')
+    self.contraEntry.place(x=50,y=75)
+
+    #cambiar label codigo por "confirmar contraseña"
+    self.codigoLabel.config(text='Confirmar contraseña:')
+    self.codigoLabel.place(x=45,y=110)
+
+    #ocultar entry del codigo
+    self.codigoEntry.place_forget()
+
+    #crear entry confiContraseña
+    self.valorContraConfi=StringVar()
+    self.contraConfiEntry=Entry(self.root,width=20,bg='#8c8c8c',\
+    font=('Leelawadee UI Semilight',13),fg='black',textvariable=self.valorContraConfi,show='*')
+    self.contraConfiEntry.place(x=50,y=150)
+
+    #boton confirmar cambio
+    self.verificarCodi=Button(self.root,bg='#038554',text='Confirmar',command=self.confiCambioContra)
+    self.verificarCodi.place(x=50,y=185)
+
+  def confiCambioContra(self):
+    #entry contraseña
+    contra=self.valorContra.get().strip()
+
+    #entry confiContraseña
+    contraConfi=self.valorContraConfi.get().strip()
+
+    if contra=='':
+      messagebox.showerror('Contraseña', 'La contraseña no puede estar vacia.')
+    elif contraConfi=='':
+      messagebox.showerror('Confirmar contraseña', 'La confirmacion de contraseña no puede estar vacia.')
+    elif len(contra)<8:
+      messagebox.showerror('Contraseña', 'La contraseña debe tener al menos 8 caracteres.')
+    elif contra!=contraConfi:
+      messagebox.showerror('Contraseña', 'Las contraseñas no coinciden.')
+    else:
+      contraNueva=self.encriptar(contra)
+
+    #funcion para cambiar contraseña
+    try:
+      cambioContraseña(contraNueva,self.valorCorreoEntry.get().strip())
+      messagebox.showinfo('Cambio contraseña', 'La contraseña se ha cambiado correctamente.')
+      self.root.destroy()
+      VentanaLogin()
+    except Exception as e:
+      print(str(e))
+      messagebox.showerror('Cambio contraseña', 'Hubo un error al cambiar la contraseña, intenta nuevamente.')
+
+  def encriptar(self,contra):
+    #caracteres para generar el salt
+    caracteres='qwertyuiopasdfghjklzxcvbnm1234567890!@#$%^&*()'
+    salt=''
+
+    #lleno el salt de forma aleatoria
+    for i in range(0,11):
+      a=int(random.randint(0,35))
+      salt+=caracteres[a]
+    
+    #junto la contraseña y el sal y luego lo hasheo
+    hash_objet=hashlib.sha256((contra+salt).encode())
+
+    #obtengo el has en formato hexadecimal
+    hex_dig = hash_objet.hexdigest()
+
+    #cojo el sal y el hash en una cadena de texto separa por ":" y ya eso se guarda en la base de datos
+    contraEncrip=salt+":"+hex_dig
+    return contraEncrip
   def volverInicio(self):
     self.root.destroy()
     VentanaLogin()
