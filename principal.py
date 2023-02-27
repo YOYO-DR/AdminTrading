@@ -1674,3 +1674,5 @@ Activo: {activo} - Valor: {valor} USD - Fecha: {fecha}''')
 
 #tarea:
 # hacer un hilo que traiga los id de las operaciones para hacer la verificacion de el cvs mas rapido, y asi puedo utilizar el executemany y que suba más rapido
+
+#nota: hay algo con el codigo en develop que hace que haya el error en pyinstaller
