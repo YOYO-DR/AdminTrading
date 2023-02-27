@@ -36,6 +36,7 @@ class VentanaPrincipal:
     #--------------------------------------------------------------------------------#
     #-----------------------elementos del apartado de la barra-----------------------#
     #--------------------------------------------------------------------------------#
+
     #apartado de barra de logo y titulo
     self.operacionesC=Canvas(self.root,width=1050,height=40,bg='grey90')
     self.operacionesC.place(x=0,y=0)
@@ -588,6 +589,9 @@ class VentanaPrincipal:
     #label de N° de operaciones buscadas
     self.mostrarNoOper=Label(self.root,text='N° de operaciones: 20',bg='grey90',\
       font=('Leelawadee UI Semilight',12))
+    
+    #llamdo de funciones en segundo plano
+    self.traerOpe()
 
     self.root.mainloop()
 
@@ -668,14 +672,17 @@ class VentanaPrincipal:
     self.hiloG.start()
 
   def guardarEspera(self):
+    #activar hilo de traer operaciones
+    self.traerOpe()
     if self.confirmarVista==True:
         sleep(0.15)
         self.desaIngre(True) #las movi al frente
       #try:
-        sumarOperacion(round((float(self.valorUsdS.get())),2),self.IDusuario)
         id_activo=buscarActivoConfi(self.valoresGuardar[1])
         self.valoresGuardar[1]=id_activo
-        guardarValores(self.IDusuario,dato=self.valoresGuardar)
+        guardarValores(dato=self.valoresGuardar)
+        self.actuActualGanPer()
+
         #actualizar los activos despues de guardar
         self.actuComboboxActivos()
         messagebox.showinfo('Operacion','La operacion se guardo correctamente')
@@ -801,20 +808,24 @@ ID: {id}'''
       self.botonVeri.config(state='disabled')
 
   def guardando(self):
+    #activar hilo para traer las operaciones
+    self.traerOpe()
+
     self.actiDesaTodo(False)
     self.botonSiburCSV.place(x=410,y=58)
     self.botonSiburCSV.config(text='Guardando...')
 
     valorActual=obtenerValorActual(self.IDusuario)
     activosActuales=obtenerActivoYId()
-    operaciones=[]
-    con=0
+    ope=[]
 
     for i in range(len(self.ope),0,-1):
       activo=str(self.ope[i-1]['activo']).lower()
       #verificar si el activo esta y si no esta agregarlo a la base de datos
+      confiActivoNuevo=False
       if activo not in activosActuales:
         idActivo=buscarActivoConfi(activo)
+        confiActivoNuevo=True
       else:
         idActivo=activosActuales[activo]
       valor=float(self.ope[i-1]['valor'])
@@ -822,19 +833,35 @@ ID: {id}'''
       fecha=self.ope[i-1]['fecha']
       idOpe=self.ope[i-1]['id']
       b=[self.IDusuario,idActivo,valor,valorPor,fecha,idOpe]
-      operaciones.append(tuple(b))
-      con+=1
-    opeGuardados=guardarValores(self.IDusuario,datos=operaciones)
-    if opeGuardados[0]>0:
-      messagebox.showwarning('Operaciones guardadas',f'Se guardaron {opeGuardados[0]} operaciones')
-      sumarOperacion(opeGuardados[1],self.IDusuario)
-      self.actuActualGanPer()
-      self.actuComboboxActivos()
+      ope.append(tuple(b))
+    
+    #verificar operaciones
+    operaciones=[]
+    sumaOpe=0
+    opeGuardados=0
+    for i in ope:
+      if not str(i[5]) in self.idsOpe:
+        operaciones.append(i)
+        sumaOpe+=i[2]
+        opeGuardados+=1
+    print(sumaOpe)
+    #guardar operaciones
+    guardarValores(self.IDusuario,datos=operaciones)
+    
+    if opeGuardados>0:
+      messagebox.showwarning('Operaciones guardadas',f'Se guardaron {opeGuardados} operaciones')
+      actualizarValorActual(self.IDusuario)
+
+      if confiActivoNuevo:
+        self.actuComboboxActivos()
     elif opeGuardados==0:
       messagebox.showwarning('Operaciones guardadas',f'No hay nuevas operaciones para guardar')
     self.botonSiburCSV.config(text='Guardado')
     self.actiDesaTodo(True)
     self.botonSiburCSV.config(text='Subir CSV')
+    if opeGuardados>0:
+      self.actuActualGanPer()
+
     self.botonSiburCSV.place(x=430,y=58)
     
     try:
@@ -874,6 +901,8 @@ ID: {id}'''
         values=self.activoOpcionesOp)
 
   def ingresarCSV(self):
+    #activar hilo de traer operaciones
+    self.traerOpe()
     file=filedialog.askopenfile(initialdir='C',filetypes=(('Fichero csv','*csv'),('Todos los archivos','*.*')))
     archivo=file
     self.ope=leerArchivoCSV(archivo)
@@ -1669,8 +1698,19 @@ Activo: {activo} - Valor: {valor} USD - Fecha: {fecha}''')
         self.sumaOpeL.place(x=870,y=150)
         self.mostrarNoOper.place(x=840,y=370)
         self.mostrarNoOper.config(text=f'N° de operaciones: {cantidad}')
+  
+  #trabajos en segundo plano
+  #descargar los  id_operacion de las operaciones para comparar antes de subir
+  def traerOpe(self):
+    self.idsOpe=traerIdOpe()
+    try:
+      self.hiloTraerOpeVari.join()
+    except:
+      pass
 
-#VentanaPrincipal(1)
+  #hilo que pone en segundo plano la funcion llamada
+  def hiloTraerOpe(self):
+    self.hiloTraerOpeVari=Thread(target=self.guardarEspera)
+    self.hiloTraerOpeVari.start()
+VentanaPrincipal(1)
 
-#tarea:
-# hacer un hilo que traiga los id de las operaciones para hacer la verificacion de el cvs mas rapido, y asi puedo utilizar el executemany y que suba más rapido

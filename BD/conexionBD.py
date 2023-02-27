@@ -234,20 +234,10 @@ def guardarValores(dato=1,datos=0):
   con=conexion()
   cursor=con.cursor()
   if dato==1:
-    opeGuardadas=0
-    sumaOpe=0
     for i in datos:
-        cursor.execute(f"select id_operacion from operaciones where id_operacion={i[5]}")
-        a=''
-        for i in cursor:
-          a=str(i)
-        if a=='':
-          sumaOpe=float(i[2])
-          sql="insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha,id_operacion) values (%s,%s,%s,%s,%s,%s)"
-          cursor.execute(sql,i)
-          opeGuardadas+=1
+      sql="insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha,id_operacion) values (%s,%s,%s,%s,%s,%s)"
+      cursor.execute(sql,i)
     con.commit()
-    return [opeGuardadas,sumaOpe]
   elif datos==0:
     sql="insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha,id_operacion) values (%s,%s,%s,%s,%s,%s)"
     cursor.execute(sql,dato)
@@ -350,18 +340,6 @@ def siguienteID():
   con.close()
   return idUltimo
 
-def sumarOperacion(operacion,idUsuario):
-  con=conexion()
-  cursor=con.cursor()
-  valorActual=0
-  cursor.execute(f"select * from usuario where id={idUsuario};")
-  for i in cursor:
-    valorActual=float(i[4])
-  valorActual+=operacion
-  cursor.execute(f"update usuario set totalActual={valorActual} where id={idUsuario};")
-  con.commit()
-  con.close()
-
 def sumaTodasOperaciones(idUsuario):
   con=conexion()
   cursor=con.cursor()
@@ -427,6 +405,16 @@ def sumaOperSemana(id):
   por=(suma/ValorIniSemana)*100
   return [suma,por]
 
+def traerIdOpe():
+  con=conexion()
+  cursor=con.cursor()
+  cursor.execute(f"select id_operacion from operaciones;")
+  idOpe=[]
+  for i in cursor:
+    idOpe.append(str(i[0]))
+  con.close()
+  return idOpe
+
 def verificarUsuario(usuario,contrasena):
   con=conexion()
   cur=con.cursor()
@@ -488,6 +476,5 @@ def cambioContraseña(contra,correo):
   cursor.execute(f"update usuario set contraseña='{contra}' where correo='{correo}'")
   con.commit()
   con.close()
-
 
 #insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha) values (1,4,-1.03,-1.03,'2022-11-23');
