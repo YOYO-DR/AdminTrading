@@ -1712,5 +1712,5 @@ Activo: {activo} - Valor: {valor} USD - Fecha: {fecha}''')
   def hiloTraerOpe(self):
     self.hiloTraerOpeVari=Thread(target=self.guardarEspera)
     self.hiloTraerOpeVari.start()
-VentanaPrincipal(1)
+#VentanaPrincipal(1)
 
