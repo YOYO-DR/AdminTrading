@@ -809,7 +809,7 @@ ID: {id}'''
     activosActuales=obtenerActivoYId()
     operaciones=[]
     con=0
-    sumaValores=0
+
     for i in range(len(self.ope),0,-1):
       activo=str(self.ope[i-1]['activo']).lower()
       #verificar si el activo esta y si no esta agregarlo a la base de datos
@@ -818,7 +818,6 @@ ID: {id}'''
       else:
         idActivo=activosActuales[activo]
       valor=float(self.ope[i-1]['valor'])
-      sumaValores+=valor
       valorPor=round(((valor/(float(valorActual)))*100),2)
       fecha=self.ope[i-1]['fecha']
       idOpe=self.ope[i-1]['id']
@@ -826,9 +825,9 @@ ID: {id}'''
       operaciones.append(tuple(b))
       con+=1
     opeGuardados=guardarValores(self.IDusuario,datos=operaciones)
-    if opeGuardados>0:
-      messagebox.showwarning('Operaciones guardadas',f'Se guardaron {opeGuardados} operaciones')
-      sumarOperacion(sumaValores,self.IDusuario)
+    if opeGuardados[0]>0:
+      messagebox.showwarning('Operaciones guardadas',f'Se guardaron {opeGuardados[0]} operaciones')
+      sumarOperacion(opeGuardados[1],self.IDusuario)
       self.actuActualGanPer()
       self.actuComboboxActivos()
     elif opeGuardados==0:
@@ -1672,3 +1671,6 @@ Activo: {activo} - Valor: {valor} USD - Fecha: {fecha}''')
         self.mostrarNoOper.config(text=f'N° de operaciones: {cantidad}')
 
 #VentanaPrincipal(1)
+
+#tarea:
+# hacer un hilo que traiga los id de las operaciones para hacer la verificacion de el cvs mas rapido, y asi puedo utilizar el executemany y que suba más rapido

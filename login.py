@@ -323,6 +323,7 @@ class RecuperarContra():
     #cojo el sal y el hash en una cadena de texto separa por ":" y ya eso se guarda en la base de datos
     contraEncrip=salt+":"+hex_dig
     return contraEncrip
+
   def volverInicio(self):
     self.root.destroy()
     VentanaLogin()
