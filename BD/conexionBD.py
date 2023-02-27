@@ -15,7 +15,7 @@ def conexion():
   auth_plugin='mysql_native_password')
   cursor = con.cursor()
   cursor.close()
-  return con 
+  return con
 
 """ def conexion():
   con = mysql.connector.connect(

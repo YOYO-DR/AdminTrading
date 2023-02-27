@@ -591,7 +591,10 @@ class VentanaPrincipal:
       font=('Leelawadee UI Semilight',12))
     
     #llamdo de funciones en segundo plano
-    self.traerOpe()
+    #variable para confirmar que el hilo este activo
+    self.confiHiloTraerOpe=False
+    self.hiloTraerOpe()
+    
 
     self.root.mainloop()
 
@@ -673,7 +676,7 @@ class VentanaPrincipal:
 
   def guardarEspera(self):
     #activar hilo de traer operaciones
-    self.traerOpe()
+    self.hiloTraerOpe()
     if self.confirmarVista==True:
         sleep(0.15)
         self.desaIngre(True) #las movi al frente
@@ -809,7 +812,7 @@ ID: {id}'''
 
   def guardando(self):
     #activar hilo para traer las operaciones
-    self.traerOpe()
+    self.hiloTraerOpe()
 
     self.actiDesaTodo(False)
     self.botonSiburCSV.place(x=410,y=58)
@@ -844,7 +847,6 @@ ID: {id}'''
         operaciones.append(i)
         sumaOpe+=i[2]
         opeGuardados+=1
-    print(sumaOpe)
     #guardar operaciones
     guardarValores(self.IDusuario,datos=operaciones)
     
@@ -902,7 +904,7 @@ ID: {id}'''
 
   def ingresarCSV(self):
     #activar hilo de traer operaciones
-    self.traerOpe()
+    self.hiloTraerOpe()
     file=filedialog.askopenfile(initialdir='C',filetypes=(('Fichero csv','*csv'),('Todos los archivos','*.*')))
     archivo=file
     self.ope=leerArchivoCSV(archivo)
@@ -1704,13 +1706,16 @@ Activo: {activo} - Valor: {valor} USD - Fecha: {fecha}''')
   def traerOpe(self):
     self.idsOpe=traerIdOpe()
     try:
+      self.confiHiloTraerOpe=False
       self.hiloTraerOpeVari.join()
     except:
       pass
 
   #hilo que pone en segundo plano la funcion llamada
   def hiloTraerOpe(self):
-    self.hiloTraerOpeVari=Thread(target=self.guardarEspera)
-    self.hiloTraerOpeVari.start()
-#VentanaPrincipal(1)
+    if not self.confiHiloTraerOpe:
+      self.hiloTraerOpeVari=Thread(target=self.traerOpe)
+      self.hiloTraerOpeVari.start()
+      self.confiHiloTraerOpe=True
+VentanaPrincipal(1)
 
