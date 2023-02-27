@@ -1,5 +1,4 @@
 from tkinter import Label,Tk,StringVar,Entry,Button,PhotoImage,messagebox,Toplevel
-import tkinter.ttk as ttk
 import hashlib
 import mysql.connector
 import smtplib

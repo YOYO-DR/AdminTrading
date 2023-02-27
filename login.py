@@ -327,7 +327,6 @@ class RecuperarContra():
     self.root.destroy()
     VentanaLogin()
 #------------------------------------Ventana registro--------------------------------#
-
 class VentanaRegistro:
   def __init__(self):
     self.registro = Tk()

@@ -5,17 +5,17 @@ from calendar import monthrange
 import hashlib
 from datos import *
 
-""" def conexion():
+def conexion():
   con = mysql.connector.connect(
   host=host,
   user=user,
   password=password,
   port='3306',
-  database='admintrading_cambiarContra',
+  database='admintrading',#admintrading_cambiarContra
   auth_plugin='mysql_native_password')
   cursor = con.cursor()
   cursor.close()
-  return con   """
+  return con  
 
 """ def conexion():
   con = mysql.connector.connect(
@@ -29,7 +29,7 @@ from datos import *
   cursor.close()
   return con """
 
-def conexion():
+""" def conexion():
   con = mysql.connector.connect(
   host='127.0.0.1',
   user='root',
@@ -39,7 +39,8 @@ def conexion():
   auth_plugin='mysql_native_password')
   cursor = con.cursor()
   cursor.close()
-  return con
+  return con """
+
 def actualizarOperacion(idOpe,activo,valor,fecha):
   con=conexion()
   cursor=con.cursor()
@@ -247,18 +248,21 @@ def guardarValores(idUsuario,dato=1,datos=0):
   if dato==1:
     opeGuardadas=0
     for i in datos:
-      try:
-        sql="insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha,id_operacion) values (%s,%s,%s,%s,%s,%s)"
-        cursor.execute(sql,i)
-        opeGuardadas+=1
-      except:
-        pass
+        cursor.execute(f"select id_operacion from operaciones where id_operacion={i[5]}")
+        a=''
+        for i in cursor:
+          a=str(i)
+        if a=='':
+          sql="insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha,id_operacion) values (%s,%s,%s,%s,%s,%s)"
+          cursor.execute(sql,i)
+          opeGuardadas+=1
+    con.commit()
+    return opeGuardadas
   elif datos==0:
     sql="insert into operaciones (id_usuario, id_activo, valor, valorPorcentaje, fecha,id_operacion) values (%s,%s,%s,%s,%s,%s)"
     cursor.execute(sql,dato)
   con.commit()
   con.close()
-  return opeGuardadas
 
 def obtenerIdUsuario(usuario):
   con=conexion()
