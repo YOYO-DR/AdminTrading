@@ -675,7 +675,7 @@ class VentanaPrincipal:
         sumarOperacion(round((float(self.valorUsdS.get())),2),self.IDusuario)
         id_activo=buscarActivoConfi(self.valoresGuardar[1])
         self.valoresGuardar[1]=id_activo
-        guardarValores(self.IDusuario,dato=self.valoresGuardar)
+        guardarValores(dato=self.valoresGuardar)
         #actualizar los activos despues de guardar
         self.actuComboboxActivos()
         messagebox.showinfo('Operacion','La operacion se guardo correctamente')
@@ -824,7 +824,7 @@ ID: {id}'''
       b=[self.IDusuario,idActivo,valor,valorPor,fecha,idOpe]
       operaciones.append(tuple(b))
       con+=1
-    opeGuardados=guardarValores(self.IDusuario,datos=operaciones)
+    opeGuardados=guardarValores(datos=operaciones)
     if opeGuardados[0]>0:
       messagebox.showwarning('Operaciones guardadas',f'Se guardaron {opeGuardados[0]} operaciones')
       sumarOperacion(opeGuardados[1],self.IDusuario)
