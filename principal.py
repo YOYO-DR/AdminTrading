@@ -59,8 +59,9 @@ class VentanaPrincipal:
     #label del valor de inicio
     actualizarValorActual(self.IDusuario)
     self.MValorActual=obtenerValorActual(self.IDusuario)
+    self.valorMaximoBD=obtenerValorMaximo(self.IDusuario)
     self.tituloB=Label(self.root,\
-      text=f'Inicio: {self.valorInicioMostrar}   Actual: {self.MValorActual}',bg='grey90',\
+      text=f'Inicio: {self.valorInicioMostrar}   Actual: {self.MValorActual}    Maximo: {self.valorMaximoBD}',bg='grey90',\
       font=('Leelawadee UI Semilight',14,'bold'))
     self.tituloB.place(x=285,y=5)
 
@@ -620,10 +621,14 @@ class VentanaPrincipal:
     self.botonCancelarO.place(x=442,y=5)
 
   def botonCancelarOpe(self):
-    self.tituloB.config(text=f'Inicio: {self.valorInicioMostrar}   Actual: {self.MValorActual}')
+    self.tituloB=Label(self.root,\
+      text=f'Inicio: {self.valorInicioMostrar}   Actual: {self.MValorActual}    Maximo: {self.valorMaximoBD}',bg='grey90',\
+      font=('Leelawadee UI Semilight',14,'bold'))
     self.botonCancelarO.place_forget()
     self.botonListoO.place_forget()
     self.entryValorN.place_forget()
+
+
 
   def botonListoOpe(self):
     control=False
@@ -639,7 +644,10 @@ class VentanaPrincipal:
           actualizarValorActual(self.IDusuario)
           self.MValorActual=obtenerValorActual(self.IDusuario)
           self.valorInicioMostrar=obtenerValorInicio(self.IDusuario)
-          self.tituloB.config(text=f'Inicio: {self.valorInicioMostrar}   Actual: {self.MValorActual}')
+          self.valorMaximoBD=obtenerValorMaximo(self.IDusuario)
+          self.tituloB=Label(self.root,\
+      text=f'Inicio: {self.valorInicioMostrar}   Actual: {self.MValorActual}    Maximo: {self.valorMaximoBD}',bg='grey90',\
+      font=('Leelawadee UI Semilight',14,'bold'))
         except:
           messagebox.showerror('Error','Error al actualizar el valor, vuelve a intentar')
           self.botonCancelarOpe()
@@ -662,7 +670,10 @@ class VentanaPrincipal:
 #----------------------funciones del apartado de ingresar operaciones----------------------#
   def actuActualGanPer(self):
     self.MValorActual=obtenerValorActual(self.IDusuario)
-    self.tituloB.config(text=f'Inicio: {self.valorInicioMostrar}   Actual: {self.MValorActual}')
+    self.valorMaximoBD=obtenerValorMaximo(self.IDusuario)
+    self.tituloB=Label(self.root,\
+      text=f'Inicio: {self.valorInicioMostrar}   Actual: {self.MValorActual}    Maximo: {self.valorMaximoBD}',bg='grey90',\
+      font=('Leelawadee UI Semilight',14,'bold'))
     #actualizar porcentajes de SL y TP
     self.valorPor=[float(obtenerValorActual(self.IDusuario))*2/100,float(obtenerValorActual(self.IDusuario))*6/100]
     self.ratioNece=round((((float(obtenerValorMaximo(self.IDusuario))-float(obtenerValorActual(self.IDusuario)))/self.valorPor[0])+1))

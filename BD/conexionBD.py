@@ -5,7 +5,7 @@ from calendar import monthrange
 import hashlib
 from datos import *
 
-""" def conexion():
+def conexion():
   con = mysql.connector.connect(
   host=host,
   user=user,
@@ -15,9 +15,9 @@ from datos import *
   auth_plugin='mysql_native_password')
   cursor = con.cursor()
   cursor.close()
-  return con  """
+  return con 
 
-def conexion():
+""" def conexion():
   con = mysql.connector.connect(
   host='127.0.0.1',
   user='root',
@@ -27,7 +27,7 @@ def conexion():
   auth_plugin='mysql_native_password')
   cursor = con.cursor()
   cursor.close()
-  return con
+  return con """
 
 def actualizarOperacion(idOpe,activo,valor,fecha):
   con=conexion()
@@ -68,7 +68,6 @@ def actualizarValorMaximo(idUsuario):
     cursor.execute(f'update usuario set valorMaximo={totalActual} where id={idUsuario}')
     con.commit()
   con.close()
-
 
 def borrarOperacion(id):
   con=conexion()
