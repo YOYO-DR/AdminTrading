@@ -77,6 +77,9 @@ class VentanaPrincipal:
     self.conexionABD()
     self.botonVeri.place(x=900,y=7)
 
+    #funciones iniciales
+    actualizarValorMaximo(self.IDusuario)
+
     #----------------------------------------------------------------------------------#
     #------------------elementos del apartado de ingresar operaciones------------------#
     #----------------------------------------------------------------------------------#
@@ -185,7 +188,11 @@ class VentanaPrincipal:
 
     #Label de 2% y 6%
     self.valorPor=[float(obtenerValorActual(self.IDusuario))*2/100,float(obtenerValorActual(self.IDusuario))*6/100]
-    self.dosPor=Label(self.root,text=f'2%: {round(self.valorPor[0],2)} USD  --  6%: {round(self.valorPor[1],2)} USD',bg='grey90',\
+
+    #obtengo el ratio que necesito para superar el maximo anterior
+    self.ratioNece=round((((float(obtenerValorMaximo(self.IDusuario))-float(obtenerValorActual(self.IDusuario)))/self.valorPor[0])+1))
+
+    self.dosPor=Label(self.root,text=f'2%: {round(self.valorPor[0],2)} USD - 6%: {round(self.valorPor[1],2)} USD - R 1/{self.ratioNece}',bg='grey90',\
                       font=('Leelawadee UI Semilight',12,'bold'))
     self.dosPor.place(x=190,y=260)
 
@@ -658,7 +665,9 @@ class VentanaPrincipal:
     self.tituloB.config(text=f'Inicio: {self.valorInicioMostrar}   Actual: {self.MValorActual}')
     #actualizar porcentajes de SL y TP
     self.valorPor=[float(obtenerValorActual(self.IDusuario))*2/100,float(obtenerValorActual(self.IDusuario))*6/100]
-    self.dosPor=Label(self.root,text=f'2%: {round(self.valorPor[0],2)} USD  --  6%: {round(self.valorPor[1],2)} USD',bg='grey90',\
+    self.ratioNece=round((((float(obtenerValorMaximo(self.IDusuario))-float(obtenerValorActual(self.IDusuario)))/self.valorPor[0])+1))
+    self.dosPor.place_forget()
+    self.dosPor=Label(self.root,text=f'2%: {round(self.valorPor[0],2)} USD - 6%: {round(self.valorPor[1],2)} USD - R 1/{self.ratioNece}',bg='grey90',\
                       font=('Leelawadee UI Semilight',12,'bold'))
     self.dosPor.place(x=190,y=260)
     self.ganPerValores()
@@ -705,6 +714,7 @@ class VentanaPrincipal:
         self.hiloG.join()
       except:
         pass
+    actualizarValorMaximo(self.IDusuario)
   
   def desaIngre(self,confi):
     if confi==True:
@@ -836,7 +846,7 @@ ID: {id}'''
     self.actiDesaTodo(True)
     self.botonSiburCSV.config(text='Subir CSV')
     self.botonSiburCSV.place(x=430,y=58)
-    
+    actualizarValorMaximo(self.IDusuario)
     try:
       self.hiloGuardarCSV.join()
     except:
@@ -1670,9 +1680,9 @@ Activo: {activo} - Valor: {valor} USD - Fecha: {fecha}''')
         self.mostrarNoOper.place(x=840,y=370)
         self.mostrarNoOper.config(text=f'N° de operaciones: {cantidad}')
 
-#VentanaPrincipal(1)
+VentanaPrincipal(1)
 
 #tarea:
-# hacer un hilo que traiga los id de las operaciones para hacer la verificacion de el cvs mas rapido, y asi puedo utilizar el executemany y que suba más rapido
+# hacer un filtro para poner la fecha de un dia, y traer todas las operaciones desde ese dai hasta el actual, y si pone una segunda fecha, trae las operaciones en ese intervalo de tiempo
 
 #nota: hay algo con el codigo en develop que hace que haya el error en pyinstaller

@@ -5,7 +5,7 @@ from calendar import monthrange
 import hashlib
 from datos import *
 
-def conexion():
+""" def conexion():
   con = mysql.connector.connect(
   host=host,
   user=user,
@@ -15,9 +15,9 @@ def conexion():
   auth_plugin='mysql_native_password')
   cursor = con.cursor()
   cursor.close()
-  return con 
+  return con  """
 
-""" def conexion():
+def conexion():
   con = mysql.connector.connect(
   host='127.0.0.1',
   user='root',
@@ -27,7 +27,7 @@ def conexion():
   auth_plugin='mysql_native_password')
   cursor = con.cursor()
   cursor.close()
-  return con """
+  return con
 
 def actualizarOperacion(idOpe,activo,valor,fecha):
   con=conexion()
@@ -54,6 +54,21 @@ def actualizarInicio(idUsuario,valor):
   cursor.execute(f"update usuario set inicioCuenta={valor} where id={idUsuario};")
   con.commit()
   con.close()
+
+def actualizarValorMaximo(idUsuario):
+  con=conexion()
+  cursor=con.cursor()
+  cursor.execute(f'select * from usuario where id={idUsuario}')
+  totalActual=0
+  valorMaximo=0
+  for i in cursor:
+    totalActual=float(i[4])
+    valorMaximo=float(i[6])
+  if valorMaximo<totalActual:
+    cursor.execute(f'update usuario set valorMaximo={totalActual} where id={idUsuario}')
+    con.commit()
+  con.close()
+
 
 def borrarOperacion(id):
   con=conexion()
@@ -282,6 +297,16 @@ def obtenerValorActual(idUsuario):
     valorActual=i[4]
   con.close()
   return valorActual
+
+def obtenerValorMaximo(idUsuario):
+  con=conexion()
+  cursor=con.cursor()
+  cursor.execute(f"select * from usuario where id={idUsuario}")
+  valorMaximo=0
+  for i in cursor:
+    valorMaximo=i[6]
+  con.close()
+  return valorMaximo
 
 def obtenerActivoYId():
   con=conexion()
