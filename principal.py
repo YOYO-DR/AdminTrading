@@ -1691,7 +1691,7 @@ Activo: {activo} - Valor: {valor} USD - Fecha: {fecha}''')
         self.mostrarNoOper.place(x=840,y=370)
         self.mostrarNoOper.config(text=f'N° de operaciones: {cantidad}')
 
-VentanaPrincipal(1)
+#VentanaPrincipal(1)
 
 #tarea:
 # hacer un filtro para poner la fecha de un dia, y traer todas las operaciones desde ese dai hasta el actual, y si pone una segunda fecha, trae las operaciones en ese intervalo de tiempo
