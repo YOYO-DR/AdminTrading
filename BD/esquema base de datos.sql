@@ -10,7 +10,8 @@ id int auto_increment primary key,
 usuario varchar(100),
 contraseña varchar(100),
 inicioCuenta decimal(9,2),
-totalActual decimal(9,2)
+totalActual decimal(9,2),
+correo varchar(100)
 );
 
 create table operaciones(

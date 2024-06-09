@@ -1,4 +1,4 @@
-from datos import correo,contra
+from BD.datos import correo,contra
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -36,3 +36,5 @@ def enviarCodigo(enviar,asunto,cuerpo):
   except Exception as e:
     print(str(e))
     return False
+
+#b'5.7.8 Username and Password not accepted. Learn more at\n5.7.8  https://support.google.com/mail/?p=BadCredentials v10-20020a25c50a000000b00bcdb7d2a03bsm760170ybe.17 - gsmtp'

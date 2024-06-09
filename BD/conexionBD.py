@@ -3,21 +3,22 @@ import time
 from datetime import datetime
 from calendar import monthrange
 import hashlib
-from datos import *
+from BD.datos import host,user, password,port
+
+# def conexion():
+#   con = mysql.connector.connect(
+#   host=host,
+#   user=user,
+#   password=password,
+#   port=port,
+#   database='admintrading',
+#   auth_plugin='mysql_native_password')
+#   cursor = con.cursor()
+#   cursor.close()
+#   return con 
+
 
 def conexion():
-  con = mysql.connector.connect(
-  host=host,
-  user=user,
-  password=password,
-  port='3306',
-  database='admintrading',
-  auth_plugin='mysql_native_password')
-  cursor = con.cursor()
-  cursor.close()
-  return con 
-
-""" def conexion():
   con = mysql.connector.connect(
   host='127.0.0.1',
   user='root',
@@ -27,7 +28,7 @@ def conexion():
   auth_plugin='mysql_native_password')
   cursor = con.cursor()
   cursor.close()
-  return con """
+  return con 
 
 def actualizarOperacion(idOpe,activo,valor,fecha):
   con=conexion()
@@ -191,11 +192,11 @@ def buscarOpeTodo(id,pos=2):
   con=conexion()
   cursor=con.cursor()
   if pos==True:
-    cursor.execute(f'select o.id, o.valor,a.nombre_activo activo,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id} and o.valor>0')
+    cursor.execute(f'select o.id, o.valor,a.nombre_activo activo,o.fecha, o.id_operacion from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id} and o.valor>0')
   elif pos==False:
-    cursor.execute(f'select o.id, o.valor,a.nombre_activo activo,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id} and o.valor<0')
+    cursor.execute(f'select o.id, o.valor,a.nombre_activo activo,o.fecha, o.id_operacion from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id} and o.valor<0')
   elif pos==2:
-    cursor.execute(f'select o.id, o.valor,a.nombre_activo activo,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id}')
+    cursor.execute(f'select o.id, o.valor,a.nombre_activo activo,o.fecha, o.id_operacion from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id}')
   
   ope=[]
   for i in cursor:
@@ -436,10 +437,14 @@ def sumaOperSemana(id):
     anioMes=f'{int(localT.tm_year)}-{int(localT.tm_mon)-1}'
   else:
     inicioS=int(localT.tm_mday)-diaActualSem
+    if inicioS<=0:
+      # calcular el ultimo dia del mes anterior
+      inicioS=int(monthrange(int(localT.tm_year),int(localT.tm_mon)-1)[1])+inicioS
+      # y le resto un mes al mes actual
     if int(localT.tm_mon)<10:
-      anioMes=f'{localT.tm_year}-0{int(localT.tm_mon)}'
+      anioMes=f'{localT.tm_year}-0{int(localT.tm_mon)-1}'
     else:
-      anioMes=f'{localT.tm_year}-{int(localT.tm_mon)}'
+      anioMes=f'{localT.tm_year}-{int(localT.tm_mon)-1}'
     
   cursor.execute(f"select o.id, o.valor,a.nombre_activo activo,o.fecha from operaciones o left join activo a on o.id_activo=a.id where o.id_usuario={id} and o.fecha > '{anioMes}-{inicioS}';")
   suma=0

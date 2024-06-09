@@ -1474,7 +1474,7 @@ ID: {id}'''
         else:
           self.operaciones=buscarOpeTodo(self.IDusuario)
         for i in self.operaciones:
-          resultado=f'ID: {i[0]} - Activo: {str(i[2]).upper()} - Valor: {float(i[1])} USD - Fecha: {str(i[3])}'
+          resultado=f'ID: {i[4]} - Activo: {str(i[2]).upper()} - Valor: {float(i[1])} USD - Fecha: {str(i[3])}'
           #inserto el dato
           self.resBus.insert(0,resultado)
         if self.resBus.get(0)=='':
